@@ -1,0 +1,2885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemistry Study Guide — Balancing Equations</title>
+<!--
+  REDESIGN NOTES (v2):
+  - Light "lab notebook" theme replacing dark moody aesthetic
+  - Two macro sections: A) Study System (Plan + Drills + Review) and B) Chemistry Deep Dive (3 concepts)
+  - Renamed concept sections for clarity
+  - Richer pedagogy: first-principles explanations, "Core idea / Common mistake / Exam shortcut" callouts
+  - Advanced Drills section added (10 harder questions)
+  - Ksp explained from scratch
+  - Activity series bars now show group/period context and family colors
+  - Organic families explained before reactions
+  - Chemistry decorative motifs via pure CSS/HTML (hexagons, atoms, flask, bubbles)
+  - No external assets, no images, no CDN
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,500;1,400&display=swap');
+
+/* ============================================================
+   DESIGN TOKENS — light lab-notebook palette
+   ============================================================ */
+:root {
+  --bg:          #f5f4ef;
+  --paper:       #fefdf9;
+  --surface:     #ffffff;
+  --surface2:    #f0ede4;
+  --border:      #e2ddd4;
+  --border2:     #c8c2b6;
+  --text:        #2a2620;
+  --text2:       #5c5548;
+  --muted:       #9c9488;
+
+  /* Accent palette */
+  --mint:        #2a9d6a;
+  --mint-light:  #e8f7f0;
+  --mint-mid:    #b8e8d0;
+  --sky:         #2878c8;
+  --sky-light:   #e8f2fc;
+  --sky-mid:     #b8d8f4;
+  --lavender:    #7060c8;
+  --lav-light:   #f0eefb;
+  --lav-mid:     #d0caf4;
+  --amber:       #c87820;
+  --amber-light: #fdf4e8;
+  --amber-mid:   #f4d898;
+  --coral:       #d84848;
+  --coral-light: #fdeeed;
+  --coral-mid:   #f4b8b8;
+  --peach:       #e87848;
+  --peach-light: #fdf0ea;
+
+  --radius:      10px;
+  --radius-lg:   16px;
+  --shadow:      0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   DECORATIVE CHEMISTRY BACKGROUND
+   Pure CSS hexagon / dot grid pattern
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(42,157,106,0.06) 1px, transparent 1px),
+    radial-gradient(circle, rgba(40,120,200,0.04) 1px, transparent 1px);
+  background-size: 32px 32px, 80px 80px;
+  background-position: 0 0, 16px 16px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================
+   CHEMISTRY DECO ATOMS (CSS-only floating circles)
+   Used in header
+   ============================================================ */
+.chem-deco {
+  position: absolute;
+  right: 2rem;
+  top: 1.5rem;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+  display: none;
+}
+@media(min-width:700px){ .chem-deco { display: block; } }
+.chem-deco .nucleus {
+  position: absolute;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--mint-light);
+  border: 2px solid var(--mint);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 2;
+}
+.chem-deco .orbit {
+  position: absolute;
+  border: 1.5px solid;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+.chem-deco .o1 { width: 70px; height: 70px; border-color: var(--mint-mid); transform: translate(-50%,-50%) rotate(30deg); }
+.chem-deco .o2 { width: 100px; height: 100px; border-color: var(--sky-mid); opacity:0.5; transform: translate(-50%,-50%) rotate(-20deg); }
+.chem-deco .electron {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--mint);
+  top: 50%; left: 50%;
+}
+.chem-deco .e1 { transform: translate(-50%,-50%) rotate(30deg) translateX(34px); }
+.chem-deco .e2 { background: var(--sky); transform: translate(-50%,-50%) rotate(210deg) translateX(49px); }
+.chem-deco .e3 { background: var(--lavender); width:6px;height:6px; transform: translate(-50%,-50%) rotate(-20deg) translateX(49px); opacity:0.6; }
+
+/* ============================================================
+   HEXAGON TILES — CSS only, used as accent motifs
+   ============================================================ */
+.hex-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0.75rem 0;
+}
+.hex-tile {
+  width: 52px; height: 58px;
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+}
+.hex-tile:hover { transform: scale(1.08); }
+.hex-tile .hex-sym { font-size: 14px; font-weight: 700; line-height: 1; }
+.hex-tile .hex-num { font-size: 9px; color: var(--muted); }
+.hex-tile.group1  { background: #fff8e8; border-color: #f4c848; }
+.hex-tile.group2  { background: #fff0f0; border-color: #f4a0a0; }
+.hex-tile.transition { background: #f0eefb; border-color: #c0b8f0; }
+.hex-tile.h-metal { background: #e8f7f0; border-color: #a0d8c0; }
+.hex-tile.nonmetal { background: #e8f2fc; border-color: #a0c8f0; }
+.hex-tile.halogen  { background: #fdf4e8; border-color: #f4c878; }
+.hex-tile.sel { outline: 2.5px solid var(--mint); outline-offset: 2px; transform: scale(1.1); }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem 2rem 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.header-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 0.6rem;
+  background: var(--mint-light);
+  border: 1px solid var(--mint-mid);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.header-label::before {
+  content: '⚗';
+  font-size: 13px;
+}
+
+h1 {
+  font-family: 'Lora', serif;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  line-height: 1.15;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+h1 em { font-style: italic; color: var(--mint); }
+
+.header-desc {
+  color: var(--text2);
+  font-size: 14px;
+  max-width: 540px;
+  line-height: 1.7;
+}
+
+.header-pills {
+  display: flex;
+  gap: 8px;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+.pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  color: var(--text2);
+  letter-spacing: 0.04em;
+  background: var(--paper);
+}
+.pill.mint   { background: var(--mint-light);   border-color: var(--mint-mid);   color: var(--mint); }
+.pill.sky    { background: var(--sky-light);    border-color: var(--sky-mid);    color: var(--sky); }
+.pill.lav    { background: var(--lav-light);    border-color: var(--lav-mid);    color: var(--lavender); }
+.pill.amber  { background: var(--amber-light);  border-color: var(--amber-mid);  color: var(--amber); }
+
+/* ============================================================
+   MACRO SECTION SWITCHER
+   Two big tabs: Study System vs Chemistry Deep Dive
+   ============================================================ */
+.macro-switcher {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(245,244,239,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1.5px solid var(--border);
+}
+.macro-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 0;
+}
+.macro-btn {
+  background: none;
+  border: none;
+  padding: 14px 20px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.macro-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--mint);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.macro-btn.active { color: var(--mint); }
+.macro-btn.active::after { transform: scaleX(1); }
+.macro-btn:hover { color: var(--text); }
+.macro-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Sub-nav within each macro section */
+.sub-nav {
+  background: var(--paper);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: none;
+}
+.sub-nav.visible { display: block; }
+.sub-nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sub-nav-inner::-webkit-scrollbar { display: none; }
+.sub-btn {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.2s;
+}
+.sub-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 16px; right: 16px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--sky);
+  transform: scaleX(0);
+  transition: transform 0.2s;
+}
+.sub-btn.active { color: var(--text); }
+.sub-btn.active::after { transform: scaleX(1); }
+.sub-btn:hover { color: var(--text); }
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 2rem 5rem;
+}
+
+/* All tab sections hidden by default */
+.tab-section { display: none; padding-top: 2rem; }
+.tab-section.active { display: block; animation: fadeUp 0.22s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+.sec-head {
+  margin-bottom: 1.5rem;
+}
+.sec-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.sec-title {
+  font-family: 'Lora', serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.25;
+  margin-bottom: 0.35rem;
+}
+.sec-objective {
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.6;
+  border-left: 3px solid var(--mint);
+  padding-left: 10px;
+  font-style: italic;
+  margin-top: 6px;
+}
+
+/* ============================================================
+   CARDS & GRIDS
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+.insight-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  box-shadow: var(--shadow-sm);
+}
+.ic-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.ic-val {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* ============================================================
+   CALLOUT BOXES
+   ============================================================ */
+.callout {
+  border-radius: var(--radius);
+  padding: 10px 14px 10px 38px;
+  font-size: 13px;
+  line-height: 1.65;
+  margin-bottom: 10px;
+  position: relative;
+}
+.callout::before {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  font-size: 14px;
+  line-height: 1;
+}
+.callout-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 3px;
+}
+.c-mint   { background: var(--mint-light);   border: 1.5px solid var(--mint-mid);   color: #1a6048; }
+.c-mint::before   { content: '💡'; }
+.c-mint .callout-label { color: var(--mint); }
+.c-sky    { background: var(--sky-light);    border: 1.5px solid var(--sky-mid);    color: #1a4878; }
+.c-sky::before    { content: '📖'; }
+.c-sky .callout-label { color: var(--sky); }
+.c-amber  { background: var(--amber-light);  border: 1.5px solid var(--amber-mid);  color: #7a4810; }
+.c-amber::before  { content: '⚠'; }
+.c-amber .callout-label { color: var(--amber); }
+.c-coral  { background: var(--coral-light);  border: 1.5px solid var(--coral-mid);  color: #8a2020; }
+.c-coral::before  { content: '✗'; }
+.c-coral .callout-label { color: var(--coral); }
+.c-lav    { background: var(--lav-light);    border: 1.5px solid var(--lav-mid);    color: #402888; }
+.c-lav::before    { content: '★'; }
+.c-lav .callout-label { color: var(--lavender); }
+.c-peach  { background: var(--peach-light);  border: 1.5px solid #f4c0a0;           color: #7a3818; }
+.c-peach::before  { content: '🔬'; }
+.c-peach .callout-label { color: var(--peach); }
+
+/* ============================================================
+   EQUATION DISPLAY
+   ============================================================ */
+.eq {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--sky);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 9px 14px;
+  display: block;
+  margin: 8px 0;
+  color: var(--sky);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   BULLET LISTS
+   ============================================================ */
+.blist { list-style: none; padding: 0; }
+.blist li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text);
+}
+.blist li::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--mint);
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+.blist.sky li::before   { background: var(--sky); }
+.blist.amber li::before { background: var(--amber); }
+.blist.coral li::before { background: var(--coral); }
+.blist.lav li::before   { background: var(--lavender); }
+
+strong { color: var(--text); font-weight: 700; }
+
+/* Section divider label */
+.sec-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1.5rem 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sec-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ============================================================
+   WORKFLOW STEPS (Study System overview)
+   ============================================================ */
+.workflow-strip {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+@media(max-width:600px){ .workflow-strip { grid-template-columns: 1fr; } }
+.wf-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.wf-card:hover { border-color: var(--mint-mid); transform: translateY(-2px); }
+.wf-icon {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+.wf-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.wf-sub   { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.wf-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.wf-1 .wf-num { background: var(--mint-light); color: var(--mint); }
+.wf-2 .wf-num { background: var(--sky-light);  color: var(--sky); }
+.wf-3 .wf-num { background: var(--lav-light);  color: var(--lavender); }
+
+/* ============================================================
+   PLAN (timeline)
+   ============================================================ */
+.plan-timeline {
+  position: relative;
+  padding-left: 24px;
+}
+.plan-timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px; top: 8px; bottom: 8px;
+  width: 2px;
+  background: var(--border);
+  border-radius: 2px;
+}
+.plan-block {
+  position: relative;
+  margin-bottom: 6px;
+}
+.plan-block::before {
+  content: '';
+  position: absolute;
+  left: -20px; top: 12px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--border2);
+  transition: border-color 0.2s, background 0.2s;
+}
+.plan-block.open::before {
+  border-color: var(--mint);
+  background: var(--mint);
+}
+.plan-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+.plan-trigger:hover { border-color: var(--mint); background: var(--mint-light); box-shadow: 0 3px 12px rgba(42,157,106,0.1); }
+.plan-block.open .plan-trigger { border-color: var(--mint); border-radius: var(--radius) var(--radius) 0 0; background: var(--mint-light); }
+.plan-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 72px;
+  letter-spacing: 0.04em;
+}
+.plan-title-text { font-size: 13.5px; font-weight: 700; color: var(--text); flex: 1; }
+.plan-caret { font-size: 11px; color: var(--muted); transition: transform 0.2s; }
+.plan-block.open .plan-caret { transform: rotate(180deg); }
+.plan-body {
+  display: none;
+  background: var(--surface);
+  border: 1.5px solid var(--mint);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 12px 14px 14px;
+}
+.plan-block.open .plan-body { display: block; }
+.plan-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.pb-concept { background: var(--mint-light);  color: var(--mint); }
+.pb-drill   { background: var(--sky-light);   color: var(--sky); }
+.pb-review  { background: var(--lav-light);   color: var(--lavender); }
+.pb-organic { background: var(--peach-light); color: var(--peach); }
+
+/* ============================================================
+   DEEP DIVE ACCORDION — same expand/collapse pattern as plan
+   Used throughout Activity Series, Precipitation, Organic tabs
+   ============================================================ */
+.dd-block {
+  position: relative;
+  margin-bottom: 6px;
+}
+.dd-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+}
+.dd-trigger:hover {
+  border-color: var(--sky);
+  background: var(--sky-light);
+  box-shadow: 0 3px 12px rgba(40,120,200,0.1);
+}
+.dd-block.open .dd-trigger {
+  border-color: var(--sky);
+  background: var(--sky-light);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.dd-trigger-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.dd-trigger-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sky);
+  margin-bottom: 1px;
+}
+.dd-trigger-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.dd-caret {
+  font-size: 11px;
+  color: var(--muted);
+  transition: transform 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.dd-block.open .dd-caret { transform: rotate(180deg); color: var(--sky); }
+.dd-trigger:hover .dd-caret { color: var(--sky); }
+.dd-body {
+  display: none;
+  background: var(--surface);
+  border: 1.5px solid var(--sky);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 14px 16px 16px;
+  animation: fadeUp 0.18s ease;
+}
+.dd-block.open .dd-body { display: block; }
+/* Variant colours for different concept areas */
+.dd-block.mint .dd-trigger:hover,
+.dd-block.mint.open .dd-trigger { border-color: var(--mint); background: var(--mint-light); }
+.dd-block.mint.open .dd-trigger { border-radius: var(--radius) var(--radius) 0 0; }
+.dd-block.mint .dd-trigger:hover .dd-caret,
+.dd-block.mint.open .dd-caret { color: var(--mint); }
+.dd-block.mint .dd-trigger-label { color: var(--mint); }
+.dd-block.mint .dd-trigger:hover { box-shadow: 0 3px 12px rgba(42,157,106,0.1); }
+.dd-block.mint .dd-body { border-color: var(--mint); }
+.dd-block.amber .dd-trigger:hover,
+.dd-block.amber.open .dd-trigger { border-color: var(--amber); background: var(--amber-light); }
+.dd-block.amber.open .dd-trigger { border-radius: var(--radius) var(--radius) 0 0; }
+.dd-block.amber .dd-trigger:hover .dd-caret,
+.dd-block.amber.open .dd-caret { color: var(--amber); }
+.dd-block.amber .dd-trigger-label { color: var(--amber); }
+.dd-block.amber .dd-trigger:hover { box-shadow: 0 3px 12px rgba(200,120,32,0.1); }
+.dd-block.amber .dd-body { border-color: var(--amber); }
+.dd-block.lav .dd-trigger:hover,
+.dd-block.lav.open .dd-trigger { border-color: var(--lavender); background: var(--lav-light); }
+.dd-block.lav.open .dd-trigger { border-radius: var(--radius) var(--radius) 0 0; }
+.dd-block.lav .dd-trigger:hover .dd-caret,
+.dd-block.lav.open .dd-caret { color: var(--lavender); }
+.dd-block.lav .dd-trigger-label { color: var(--lavender); }
+.dd-block.lav .dd-trigger:hover { box-shadow: 0 3px 12px rgba(112,96,200,0.1); }
+.dd-block.lav .dd-body { border-color: var(--lavender); }
+.dd-block.coral .dd-trigger:hover,
+.dd-block.coral.open .dd-trigger { border-color: var(--coral); background: var(--coral-light); }
+.dd-block.coral.open .dd-trigger { border-radius: var(--radius) var(--radius) 0 0; }
+.dd-block.coral .dd-trigger:hover .dd-caret,
+.dd-block.coral.open .dd-caret { color: var(--coral); }
+.dd-block.coral .dd-trigger-label { color: var(--coral); }
+.dd-block.coral .dd-trigger:hover { box-shadow: 0 3px 12px rgba(216,72,72,0.1); }
+.dd-block.coral .dd-body { border-color: var(--coral); }
+
+/* ============================================================
+   ACTIVITY SERIES — hex tiles + bar chart
+   ============================================================ */
+.series-section {
+  margin-bottom: 1rem;
+}
+.series-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 6px;
+}
+.series-bars {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  height: 130px;
+}
+.metal-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+.metal-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: opacity 0.15s, outline 0.15s, filter 0.15s;
+  position: relative;
+}
+.metal-col:hover .metal-bar { opacity: 0.8; filter: brightness(1.1); outline: 2px dashed rgba(0,0,0,0.25); outline-offset: 1px; }
+.metal-col.sel .metal-bar { outline: 2.5px solid var(--text); outline-offset: 1px; filter: brightness(1.05); }
+.metal-sym {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text2);
+  text-align: center;
+  font-weight: 600;
+}
+.metal-col.sel .metal-sym { color: var(--mint); font-weight: 700; }
+.metal-grp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: var(--muted);
+  text-align: center;
+}
+#metal-detail {
+  display: none;
+  margin-top: 10px;
+  animation: fadeUp 0.18s ease;
+}
+
+/* Periodic table family legend */
+.family-legend {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.fam-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text2);
+}
+.fam-dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   HALOGENS
+   ============================================================ */
+.halogen-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+  margin: 10px 0 1rem;
+}
+@media(max-width:500px){ .halogen-grid { grid-template-columns: repeat(2,1fr); } }
+.hal-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.hal-pt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.hal-sym { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; }
+.hal-name { font-size: 11px; color: var(--text2); margin-top: 2px; font-weight: 600; }
+.hal-tag {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 5px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.hal-note { font-size: 10.5px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+/* ============================================================
+   KSP / PRECIPITATION
+   ============================================================ */
+.ksp-visual {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin: 1rem 0;
+  box-shadow: var(--shadow-sm);
+}
+.ksp-beaker {
+  width: 80px;
+  height: 90px;
+  margin: 0 auto 12px;
+  position: relative;
+}
+.beaker-body {
+  width: 60px;
+  height: 65px;
+  border: 3px solid var(--border2);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+}
+.beaker-liquid {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 50px;
+  background: linear-gradient(to top, rgba(40,120,200,0.15), rgba(40,120,200,0.08));
+  border-radius: 0 0 10px 10px;
+}
+.beaker-precip {
+  position: absolute;
+  bottom: 0; left: 4px; right: 4px;
+  height: 10px;
+  background: rgba(216,72,72,0.3);
+  border-radius: 0 0 8px 8px;
+}
+.beaker-rim {
+  width: 66px;
+  height: 8px;
+  border: 3px solid var(--border2);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  margin: 0 auto;
+}
+.beaker-spout {
+  width: 14px;
+  height: 10px;
+  border: 3px solid var(--border2);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  position: absolute;
+  top: -10px;
+  right: 4px;
+}
+.ion-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  margin: 8px 0;
+}
+.ion-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  animation: float 2s ease-in-out infinite;
+}
+.ion-dot:nth-child(2) { animation-delay: 0.4s; }
+.ion-dot:nth-child(3) { animation-delay: 0.8s; }
+.ion-dot:nth-child(4) { animation-delay: 1.2s; }
+.ion-dot.pos { background: var(--sky-light); color: var(--sky); border: 1.5px solid var(--sky-mid); }
+.ion-dot.neg { background: var(--coral-light); color: var(--coral); border: 1.5px solid var(--coral-mid); }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+
+/* Solubility rules */
+.rule-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+@media(max-width:500px){ .rule-grid { grid-template-columns: 1fr; } }
+.rule-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  box-shadow: var(--shadow-sm);
+}
+.rule-ion {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px;
+  color: var(--text);
+  font-weight: 600;
+}
+.rule-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.sol     { background: #2a9d6a; }
+.insol   { background: #d84848; }
+.partial { background: #c87820; }
+
+.legend-row {
+  display: flex; gap: 14px; margin-bottom: 10px;
+  font-size: 12.5px; color: var(--text2); align-items: center; flex-wrap: wrap;
+}
+.legend-row span { display: flex; align-items: center; gap: 6px; }
+
+/* Precipitation checker */
+.checker-wrap {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.4rem;
+  box-shadow: var(--shadow-sm);
+}
+.checker-row {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;
+}
+.checker-label { font-size: 13px; color: var(--text2); font-weight: 600; }
+select.chem-select {
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 6px 10px;
+  cursor: pointer;
+  outline: none;
+}
+select.chem-select:focus { border-color: var(--sky); }
+#precip-result {
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  margin-top: 6px;
+}
+
+/* ============================================================
+   ORGANIC FAMILIES
+   ============================================================ */
+.family-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+.fam-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-sm);
+}
+.fam-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.fam-formula {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.fam-sub { font-size: 12px; color: var(--text2); line-height: 1.5; margin-top: 4px; }
+.fam-clue {
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 7px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Reaction cards */
+.rx-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+@media(max-width:560px){ .rx-grid { grid-template-columns: 1fr; } }
+.rx-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, background 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.rx-card::after {
+  content: '▼';
+  position: absolute;
+  top: 13px; right: 14px;
+  font-size: 10px;
+  color: var(--muted);
+  transition: transform 0.2s, color 0.2s;
+}
+.rx-card:hover { border-color: var(--mint); transform: translateY(-2px); background: var(--mint-light); box-shadow: 0 4px 16px rgba(42,157,106,0.12); }
+.rx-card:hover::after { color: var(--mint); }
+.rx-card.open { border-color: var(--mint); background: #f2fbf6; }
+.rx-card.open::after { transform: rotate(180deg); color: var(--mint); }
+.rx-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
+.tag {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+.tg  { background: var(--mint-light); color: var(--mint); }
+.ta  { background: var(--amber-light); color: var(--amber); }
+.tb  { background: var(--sky-light); color: var(--sky); }
+.tr  { background: var(--coral-light); color: var(--coral); }
+.tp  { background: var(--lav-light); color: var(--lavender); }
+.tpe { background: var(--peach-light); color: var(--peach); }
+
+.rx-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.rx-sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.rx-detail { display: none; margin-top: 10px; padding-top: 10px; border-top: 1.5px solid var(--border); }
+.rx-detail.open { display: block; }
+
+/* O2 calculator */
+.calc-wrap {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.4rem;
+  margin-top: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+.calc-row {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px;
+}
+.calc-label { font-size: 12px; color: var(--text2); min-width: 80px; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+input.calc-input {
+  width: 58px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 5px 8px;
+  text-align: center;
+  outline: none;
+}
+input.calc-input:focus { border-color: var(--sky); }
+.calc-result {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--sky);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: var(--text);
+  white-space: pre-wrap;
+  margin-top: 6px;
+}
+
+/* ============================================================
+   DRILLS
+   ============================================================ */
+.filter-bar {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem;
+}
+.filter-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border2);
+  background: var(--paper);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+  font-weight: 500;
+}
+.filter-btn.on { background: var(--mint-light); color: var(--mint); border-color: var(--mint-mid); }
+.filter-btn:hover:not(.on) { background: var(--surface2); color: var(--text); }
+
+.progress-wrap { margin-bottom: 1.25rem; }
+.prog-meta {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace; margin-bottom: 5px;
+}
+.prog-track {
+  background: var(--surface2);
+  border-radius: 99px;
+  height: 6px;
+  overflow: hidden;
+}
+.prog-fill {
+  height: 6px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--mint), #48c898);
+  transition: width 0.35s ease;
+}
+
+.drill-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.3rem;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s;
+}
+.drill-card.got  { border-color: #2a9d6a; background: #f8fdf9; }
+.drill-card.miss { border-color: #d84848; background: #fdf8f8; }
+.drill-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.drill-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--sky-light);
+  color: var(--sky);
+  font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.drill-q {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--sky);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 8px 12px;
+  margin-bottom: 7px;
+  color: var(--sky);
+  line-height: 1.5;
+}
+.drill-hint {
+  font-size: 12.5px;
+  color: var(--text2);
+  margin-bottom: 10px;
+  line-height: 1.55;
+  background: var(--amber-light);
+  border: 1px solid var(--amber-mid);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.drill-hint::before { content: '💡'; font-size: 13px; flex-shrink: 0; }
+.answer-box {
+  display: none;
+  background: var(--mint-light);
+  border: 1.5px solid var(--mint-mid);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.answer-box.show { display: block; }
+.ans-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--mint); margin-bottom: 4px; font-weight: 600; }
+.ans-explain { font-size: 12.5px; color: #1a6048; line-height: 1.55; }
+
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  font-size: 12px;
+  padding: 5px 13px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border2);
+  background: var(--paper);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  transition: all 0.15s;
+  color: var(--text2);
+}
+.btn-show:hover { background: var(--surface2); color: var(--text); }
+.btn-got  { color: #2a9d6a; border-color: var(--mint-mid); background: var(--mint-light); }
+.btn-got:hover { background: var(--mint-mid); }
+.btn-miss { color: #d84848; border-color: var(--coral-mid); background: var(--coral-light); }
+.btn-miss:hover { background: var(--coral-mid); }
+.btn-clear { color: var(--sky); border-color: var(--sky-mid); background: var(--sky-light); }
+.btn-clear:hover { background: var(--sky-mid); }
+
+.diff-easy   { background: var(--mint-light);  color: var(--mint); }
+.diff-medium { background: var(--amber-light); color: var(--amber); }
+.diff-hard   { background: var(--coral-light); color: var(--coral); }
+.diff-advanced { background: var(--lav-light); color: var(--lavender); }
+.org-tag { background: var(--peach-light); color: var(--peach); }
+
+/* ============================================================
+   ADVANCED DRILLS — distinct visual treatment
+   ============================================================ */
+.adv-header {
+  background: var(--lav-light);
+  border: 1.5px solid var(--lav-mid);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.adv-flask {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.adv-header-text { }
+.adv-header-title { font-size: 14px; font-weight: 700; color: var(--lavender); margin-bottom: 2px; }
+.adv-header-sub { font-size: 12.5px; color: #5848a0; line-height: 1.4; }
+
+.adv-drill-card {
+  background: var(--surface);
+  border: 1.5px solid var(--lav-mid);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.3rem;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.adv-drill-card.got  { border-color: #2a9d6a; background: #f8fdf9; }
+.adv-drill-card.miss { border-color: #d84848; background: #fdf8f8; }
+.adv-q {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+.adv-context {
+  font-size: 12.5px;
+  color: var(--text2);
+  font-style: italic;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   REVIEW / STATS
+   ============================================================ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+@media(max-width:500px){ .stats-row { grid-template-columns: repeat(2,1fr); } }
+.stat-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.stat-n {
+  font-family: 'Lora', serif;
+  font-size: 28px;
+  color: var(--text);
+  line-height: 1.1;
+}
+.stat-n.green { color: var(--mint); }
+.stat-n.red   { color: var(--coral); }
+.stat-n.amber { color: var(--amber); }
+.stat-l { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 3px; }
+
+.review-card {
+  background: var(--surface);
+  border: 1.5px solid var(--coral-mid);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.3rem;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.review-label { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--coral); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
+.review-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+  font-size: 14px;
+}
+.review-empty .big { font-size: 40px; margin-bottom: 10px; }
+
+/* ============================================================
+   DEEP DIVE TOPIC STRIP
+   ============================================================ */
+.topic-strip {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+@media(max-width:600px){ .topic-strip { grid-template-columns: 1fr; } }
+.topic-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s;
+  text-align: center;
+}
+.topic-card:hover { transform: translateY(-2px); border-color: var(--mint-mid); }
+.topic-card.active { border-color: var(--mint); background: var(--mint-light); }
+.topic-icon { font-size: 24px; margin-bottom: 5px; }
+.topic-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.35; }
+.topic-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* ============================================================
+   STEPS
+   ============================================================ */
+.steps { list-style: none; padding: 0; }
+.steps li {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 7px;
+  font-size: 13.5px; line-height: 1.6; color: var(--text);
+}
+.step-n {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--sky-light); color: var(--sky);
+  font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1.5px solid var(--border);
+  padding: 1.25rem 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footer-text { font-size: 11.5px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.flask-icon {
+  width: 14px; height: 20px;
+  position: relative;
+  display: inline-block;
+}
+.flask-icon::before {
+  content: '';
+  display: block;
+  width: 8px; height: 3px;
+  background: var(--muted);
+  border-radius: 2px 2px 0 0;
+  margin: 0 auto;
+}
+.flask-icon::after {
+  content: '';
+  display: block;
+  width: 14px; height: 13px;
+  background: var(--mint-light);
+  border: 1.5px solid var(--muted);
+  border-radius: 0 0 6px 6px;
+  border-top: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:620px){
+  header { padding: 1.75rem 1.25rem 1.25rem; }
+  main { padding: 0 1.25rem 3rem; }
+  .macro-inner { padding: 0 1.25rem; }
+  .sub-nav { padding: 0 1.25rem; }
+  footer { padding: 1rem 1.25rem; }
+  h1 { font-size: 1.75rem; }
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+.mt1 { margin-top: 0.6rem; }
+.mt2 { margin-top: 1rem; }
+.mt3 { margin-top: 1.5rem; }
+.mb1 { margin-bottom: 0.6rem; }
+.mb2 { margin-bottom: 1rem; }
+.gap { height: 1rem; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header>
+  <!-- Pure-CSS atom decoration -->
+  <div class="chem-deco">
+    <div class="nucleus"></div>
+    <div class="orbit o1"></div>
+    <div class="orbit o2"></div>
+    <div class="electron e1"></div>
+    <div class="electron e2"></div>
+    <div class="electron e3"></div>
+  </div>
+
+  <div class="header-label">Chemistry · Intermediate</div>
+  <h1>Balancing <em>Equations</em><br>Study Guide</h1>
+  <p class="header-desc">A complete study system covering conservation of mass, metal reactivity, solubility, organic reactions, and 35 mixed drills — from easy to advanced.</p>
+  <div class="header-pills">
+    <span class="pill mint">⏱ 40-min session</span>
+    <span class="pill sky">35 drills + 10 advanced</span>
+    <span class="pill lav">3 deep-dive concepts</span>
+    <span class="pill amber">Review loop included</span>
+  </div>
+</header>
+
+<!-- ============================================================
+     MACRO NAVIGATION — Study System vs Chemistry Deep Dive
+     ============================================================ -->
+<div class="macro-switcher">
+  <div class="macro-inner">
+    <button class="macro-btn active" onclick="showMacro('study',this)">
+      <span class="macro-icon">📋</span> Study System
+    </button>
+    <button class="macro-btn" onclick="showMacro('deepdive',this)">
+      <span class="macro-icon">🔬</span> Chemistry Deep Dive
+    </button>
+  </div>
+</div>
+
+<!-- Sub-nav for Study System -->
+<div id="subnav-study" class="sub-nav visible">
+  <div class="sub-nav-inner">
+    <button class="sub-btn active" onclick="showTab('plan',this,'study')">1. Learn — Session Plan</button>
+    <button class="sub-btn" onclick="showTab('drills',this,'study')">2. Practice — Drills (25)</button>
+    <button class="sub-btn" onclick="showTab('advanced',this,'study')">3. Advanced Drills (10)</button>
+    <button class="sub-btn" onclick="showTab('review',this,'study')">4. Review Loop</button>
+  </div>
+</div>
+
+<!-- Sub-nav for Deep Dive -->
+<div id="subnav-deepdive" class="sub-nav">
+  <div class="sub-nav-inner">
+    <button class="sub-btn" onclick="showTab('activity',this,'deepdive')">Metal Reactivity & Displacement</button>
+    <button class="sub-btn" onclick="showTab('precip',this,'deepdive')">Solubility, Ksp & Precipitation</button>
+    <button class="sub-btn" onclick="showTab('organic',this,'deepdive')">Core Organic Reactions</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<main>
+
+<!-- ============================================================
+     TAB: SESSION PLAN
+     ============================================================ -->
+<div id="tab-plan" class="tab-section active" data-macro="study">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Study System · Step 1</div>
+    <div class="sec-title">Your 40-Minute Session Plan</div>
+    <div class="sec-objective">Follow this plan once before doing the drills — it tells you what to study, in what order, and why interleaving works better than cramming.</div>
+  </div>
+
+  <!-- Workflow overview -->
+  <div class="workflow-strip">
+    <div class="wf-card wf-1" onclick="showTabByName('plan')">
+      <div class="wf-num">1</div>
+      <div class="wf-icon">📖</div>
+      <div class="wf-title">Learn</div>
+      <div class="wf-sub">Read the session plan. Understand the concepts before you drill.</div>
+    </div>
+    <div class="wf-card wf-2" onclick="showTabByName('drills')">
+      <div class="wf-num">2</div>
+      <div class="wf-icon">✏️</div>
+      <div class="wf-title">Practice</div>
+      <div class="wf-sub">Work through 25 mixed drills. Mark got it / missed honestly.</div>
+    </div>
+    <div class="wf-card wf-3" onclick="showTabByName('review')">
+      <div class="wf-num">3</div>
+      <div class="wf-icon">🔄</div>
+      <div class="wf-title">Review</div>
+      <div class="wf-sub">All missed questions land here. Re-attempt until they're clear.</div>
+    </div>
+  </div>
+
+  <div class="callout c-mint">
+    <span class="callout-label">Why interleaving works</span>
+    Mixing different question types forces your brain to figure out <em>which strategy to use</em>, not just apply one on autopilot. It's harder in the moment — but research shows it produces much stronger long-term memory.
+  </div>
+
+  <div class="sec-label">Expand each block for full concept notes</div>
+  <div class="plan-timeline" id="plan-blocks"></div>
+</div>
+
+<!-- ============================================================
+     TAB: DRILLS
+     ============================================================ -->
+<div id="tab-drills" class="tab-section" data-macro="study">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Study System · Step 2</div>
+    <div class="sec-title">25 Mixed Practice Drills</div>
+    <div class="sec-objective">Work through these in order. Don't skip ahead to the answer — try each one first. Mark yourself honestly: that's how the review loop helps you.</div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn on" onclick="setFilter('all',this)">All (25)</button>
+    <button class="filter-btn" onclick="setFilter('inorganic',this)">Inorganic (15)</button>
+    <button class="filter-btn" onclick="setFilter('organic',this)">Organic (10)</button>
+    <button class="filter-btn" onclick="setFilter('missed',this)">Missed only</button>
+  </div>
+  <div class="progress-wrap">
+    <div class="prog-meta"><span>Progress</span><span id="prog-text">0 / 25 answered</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div id="drills-list"></div>
+</div>
+
+<!-- ============================================================
+     TAB: ADVANCED DRILLS
+     ============================================================ -->
+<div id="tab-advanced" class="tab-section" data-macro="study">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Study System · Challenge</div>
+    <div class="sec-title">Advanced Drills</div>
+    <div class="sec-objective">These questions are harder because they require deeper understanding, not just pattern-matching. Expect multi-step reasoning, explain-why questions, and tricky distractors.</div>
+  </div>
+  <div class="adv-header">
+    <div class="adv-flask">⚗️</div>
+    <div class="adv-header-text">
+      <div class="adv-header-title">Exam-style challenge questions</div>
+      <div class="adv-header-sub">Mix of: predict the products · will/won't react · explain why · tricky balancing · mixed-concept reasoning</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="prog-meta"><span>Advanced progress</span><span id="adv-prog-text">0 / 10 answered</span></div>
+    <div class="prog-track"><div class="prog-fill" id="adv-prog-fill" style="width:0%"></div></div>
+  </div>
+  <div id="advanced-list"></div>
+</div>
+
+<!-- ============================================================
+     TAB: REVIEW LOOP
+     ============================================================ -->
+<div id="tab-review" class="tab-section" data-macro="study">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Study System · Step 3</div>
+    <div class="sec-title">Mastery Loop</div>
+    <div class="sec-objective">Every question you marked "missed it" reappears here. Re-attempt until your review list is empty. Then wait 24 hours and try again — that spacing interval is where real learning happens.</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-n" id="st-total">0</div><div class="stat-l">answered</div></div>
+    <div class="stat-card"><div class="stat-n green" id="st-got">0</div><div class="stat-l">got it ✓</div></div>
+    <div class="stat-card"><div class="stat-n red" id="st-miss">0</div><div class="stat-l">to review</div></div>
+    <div class="stat-card"><div class="stat-n amber" id="st-pct">0%</div><div class="stat-l">accuracy</div></div>
+  </div>
+  <div class="callout c-lav">
+    <span class="callout-label">Mastery tip</span>
+    For every question you missed, don't just check the answer — identify <em>where</em> your thinking went wrong. Was it: wrong atom count? Wrong balancing order? Forgot a polyatomic ion unit? Misidentified reaction type? Fix the <em>root cause</em>, not just the answer.
+  </div>
+  <div class="sec-label">Questions to re-attempt</div>
+  <div id="review-list"></div>
+</div>
+
+<!-- ============================================================
+     TAB: METAL REACTIVITY & DISPLACEMENT
+     ============================================================ -->
+<div id="tab-activity" class="tab-section" data-macro="deepdive">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Chemistry Deep Dive · Concept 1 of 3</div>
+    <div class="sec-title">Metal Reactivity &amp; Displacement Reactions</div>
+    <div class="sec-objective">Learn how to predict which metal will displace another, why some metals are more reactive, and how the activity series connects to electron behaviour.</div>
+  </div>
+
+  <!-- KEY CONCEPTS — accordion blocks -->
+  <div class="sec-label">Key concepts — click any to expand</div>
+
+  <div class="dd-block mint" id="dd-act1">
+    <div class="dd-trigger" onclick="toggleDD('act1')">
+      <span class="dd-trigger-icon">💡</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Core idea</div>
+        <div class="dd-trigger-title">What is the activity series actually ranking?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      The activity series ranks metals by how <strong>eagerly they give away electrons</strong> to become positive ions. Potassium at the top is desperate to lose electrons — it reacts explosively with water. Gold at the bottom barely reacts with anything. The series is not arbitrary: it reflects the underlying atomic structure of each element.
+      <br><br>The key property being measured is how tightly the atom holds its outer electrons. Metals high on the series have outer electrons far from the nucleus and loosely held — easy to remove. Metals low on the series hold their electrons tightly. This energy difference is captured as <strong>electrode potential</strong>: a higher metal has a more negative electrode potential, meaning it "wants" to oxidise.
+    </div>
+  </div>
+
+  <div class="dd-block" id="dd-act2">
+    <div class="dd-trigger" onclick="toggleDD('act2')">
+      <span class="dd-trigger-icon">🔄</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">How it works</div>
+        <div class="dd-trigger-title">How does displacement actually happen?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      When you place zinc metal into copper sulfate solution, you're asking: <em>which metal is more stable as an ion here?</em> Zinc ions (Zn²⁺) are more stable in solution than copper ions (Cu²⁺). So zinc dissolves — giving away 2 electrons — and copper ions pick those electrons up and plate out as solid copper metal.
+      <br><br>The more reactive metal <strong>always</strong> displaces the less reactive one. Never the other way around. The driving force is the difference in electrode potential: a bigger gap in the series means more energy is released and the reaction happens faster and more completely.
+      <code class="eq" style="margin-top:10px">Zn + CuSO₄ → ZnSO₄ + Cu &nbsp; (Zn is above Cu in the series ✓)</code>
+    </div>
+  </div>
+
+  <div class="dd-block lav" id="dd-act3">
+    <div class="dd-trigger" onclick="toggleDD('act3')">
+      <span class="dd-trigger-icon">📖</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Why it matters</div>
+        <div class="dd-trigger-title">Why does hydrogen appear in the middle?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      Hydrogen is included as a reference point, not a metal. It helps you predict acid reactions: any metal <strong>above H</strong> will displace hydrogen from dilute acid, producing H₂ gas. Metals below H — like copper, silver, gold — cannot do this.
+      <br><br>That's why you can dissolve iron in dilute HCl (Fe is above H) but you can't dissolve copper in it (Cu is below H). In exams, if you're asked "does this metal react with dilute acid?", just check whether it's above or below H in the series.
+      <code class="eq" style="margin-top:10px">Fe + 2HCl → FeCl₂ + H₂ ↑ &nbsp; (Fe above H ✓)</code>
+      <code class="eq">Cu + HCl → no reaction &nbsp; (Cu below H ✗)</code>
+    </div>
+  </div>
+
+  <div class="dd-block coral" id="dd-act4">
+    <div class="dd-trigger" onclick="toggleDD('act4')">
+      <span class="dd-trigger-icon">⚠</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Common mistake</div>
+        <div class="dd-trigger-title">Writing a displacement reaction backwards</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      Students often write a reaction where a <em>less</em> reactive metal displaces a <em>more</em> reactive one — e.g. copper displacing zinc from zinc sulfate. This never happens. The reaction would need to run uphill energetically — it's thermodynamically forbidden.
+      <br><br>Always check: is the element you're adding <strong>higher</strong> in the series than the dissolved metal? If not, write "no reaction". This check takes two seconds and prevents a common exam error.
+    </div>
+  </div>
+
+  <!-- Insight cards -->
+  <div class="card-grid" style="margin-top:1rem">
+    <div class="insight-card"><div class="ic-label">The series ranks</div><div class="ic-val">How strongly each metal "wants" to lose electrons</div></div>
+    <div class="insight-card"><div class="ic-label">Displacement rule</div><div class="ic-val">A metal displaces another only if it sits higher in the series</div></div>
+    <div class="insight-card"><div class="ic-label">The H₂ benchmark</div><div class="ic-val">Metals above H react with dilute acids — below H, they don't</div></div>
+  </div>
+
+  <!-- Interactive bar chart -->
+  <div class="sec-label">Click a metal bar to see its displacement power and periodic position</div>
+  <div class="family-legend" id="fam-legend"></div>
+  <div class="series-section">
+    <div class="series-labels">
+      <span>↑ more reactive (loses e⁻ eagerly)</span>
+      <span>less reactive (holds e⁻ tightly) ↓</span>
+    </div>
+    <div class="series-bars" id="series-bars"></div>
+  </div>
+  <div id="metal-detail" class="callout c-sky"></div>
+
+  <!-- Halogens -->
+  <div class="sec-label">Halogens — the same idea, but gaining electrons</div>
+
+  <div class="dd-block" id="dd-hal1">
+    <div class="dd-trigger" onclick="toggleDD('hal1')">
+      <span class="dd-trigger-icon">💡</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Core idea</div>
+        <div class="dd-trigger-title">Halogens are the mirror image of metals</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      Metals compete to <em>lose</em> electrons. Halogens compete to <em>gain</em> electrons. The most reactive halogen (F₂) grabs electrons from any other halide ion. The least reactive (I₂) barely holds onto the electrons it already has.
+      <br><br>The trend runs <strong>down Group 17</strong> of the periodic table — as atomic radius increases, the nucleus is farther from the outer shell and attracts incoming electrons less strongly. So reactivity <em>decreases</em> going down (F > Cl > Br > I), which is the opposite of what happens with alkali metals.
+    </div>
+  </div>
+
+  <div class="dd-block lav" id="dd-hal2">
+    <div class="dd-trigger" onclick="toggleDD('hal2')">
+      <span class="dd-trigger-icon">★</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Exam shortcut</div>
+        <div class="dd-trigger-title">The colour-change test for halogen displacement</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      Add Cl₂ water to a solution containing Br⁻ or I⁻, then shake with cyclohexane (an organic layer). The organic layer turns:
+      <ul class="blist lav" style="margin-top:8px">
+        <li><strong>Orange</strong> — Br₂ has been displaced from Br⁻</li>
+        <li><strong>Violet/purple</strong> — I₂ has been displaced from I⁻</li>
+      </ul>
+      This colour change is your observable proof that displacement occurred. In exams, the question will often ask you to describe what you <em>see</em> — give the colour and what it means.
+    </div>
+  </div>
+
+  <div class="halogen-grid">
+    <div class="hal-card" style="border-color:var(--sky-mid)">
+      <div class="hal-pt">Period 2 · Group 17</div>
+      <div class="hal-sym" style="color:var(--sky)">F₂</div>
+      <div class="hal-name">Fluorine</div>
+      <div class="hal-tag" style="background:var(--sky-light);color:var(--sky)">strongest oxidiser</div>
+      <div class="hal-note">Most electronegative element. Displaces Cl⁻, Br⁻, I⁻.</div>
+    </div>
+    <div class="hal-card" style="border-color:var(--mint-mid)">
+      <div class="hal-pt">Period 3 · Group 17</div>
+      <div class="hal-sym" style="color:var(--mint)">Cl₂</div>
+      <div class="hal-name">Chlorine</div>
+      <div class="hal-tag" style="background:var(--mint-light);color:var(--mint)">displaces Br⁻, I⁻</div>
+      <div class="hal-note">Smaller atom than Br — nucleus pulls electrons more strongly.</div>
+    </div>
+    <div class="hal-card" style="border-color:var(--amber-mid)">
+      <div class="hal-pt">Period 4 · Group 17</div>
+      <div class="hal-sym" style="color:var(--amber)">Br₂</div>
+      <div class="hal-name">Bromine</div>
+      <div class="hal-tag" style="background:var(--amber-light);color:var(--amber)">displaces I⁻ only</div>
+      <div class="hal-note">Larger atom — weaker pull on incoming electrons.</div>
+    </div>
+    <div class="hal-card" style="border-color:var(--coral-mid)">
+      <div class="hal-pt">Period 5 · Group 17</div>
+      <div class="hal-sym" style="color:var(--coral)">I₂</div>
+      <div class="hal-name">Iodine</div>
+      <div class="hal-tag" style="background:var(--coral-light);color:var(--coral)">weakest — can't displace</div>
+      <div class="hal-note">Largest atom — electrons too far from nucleus to attract new ones.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: SOLUBILITY, Ksp & PRECIPITATION
+     ============================================================ -->
+<div id="tab-precip" class="tab-section" data-macro="deepdive">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Chemistry Deep Dive · Concept 2 of 3</div>
+    <div class="sec-title">Solubility, K<sub>sp</sub> &amp; Precipitation Reactions</div>
+    <div class="sec-objective">Understand from first principles why some ionic compounds dissolve and others don't — and how to predict whether mixing two solutions will produce a solid precipitate.</div>
+  </div>
+
+  <!-- Insight cards -->
+  <div class="card-grid">
+    <div class="insight-card"><div class="ic-label">Why precipitates form</div><div class="ic-val">Lattice energy of the solid beats hydration energy keeping ions dissolved</div></div>
+    <div class="insight-card"><div class="ic-label">The Ksp idea</div><div class="ic-val">Tiny Ksp = almost no ions can coexist in solution — solid forms immediately</div></div>
+    <div class="insight-card"><div class="ic-label">The test</div><div class="ic-val">If [A⁺][B⁻] exceeds Ksp, precipitation starts at once</div></div>
+  </div>
+
+  <!-- Ksp accordion blocks -->
+  <div class="sec-label">Build your understanding — click each step to expand</div>
+
+  <div class="dd-block" id="dd-ksp1">
+    <div class="dd-trigger" onclick="toggleDD('ksp1')">
+      <span class="dd-trigger-icon">📖</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Step 1</div>
+        <div class="dd-trigger-title">What does "solubility" actually mean?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      When an ionic solid dissolves in water, it breaks apart into positive and negative ions. Water molecules surround each ion — this is called <strong>hydration</strong> — and pull the crystal lattice apart. A compound is <em>soluble</em> if this process releases enough energy to break the lattice.
+      <br><br>Two forces are in competition: the <strong>lattice energy</strong> (how tightly the crystal holds itself together) and the <strong>hydration energy</strong> (how strongly water molecules attract the freed ions). If hydration wins → the compound dissolves. If lattice energy wins → the compound is insoluble.
+    </div>
+  </div>
+
+  <div class="dd-block mint" id="dd-ksp2">
+    <div class="dd-trigger" onclick="toggleDD('ksp2')">
+      <span class="dd-trigger-icon">📖</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Step 2</div>
+        <div class="dd-trigger-title">What is a saturated solution?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      As you keep dissolving a salt, at some point the solution becomes <strong>saturated</strong>: ions are re-joining the crystal just as fast as they're leaving it. This is a <em>dynamic equilibrium</em> — both processes (dissolving and crystallising) happen simultaneously at equal rates.
+      <br><br>The solution looks still, but at the molecular level there's constant activity. You can't dissolve any more solid past this point — adding more just makes the undissolved pile at the bottom bigger.
+      <!-- CSS-only beaker -->
+      <div class="ksp-visual" style="margin-top:12px">
+        <div style="display:flex;align-items:center;gap:2rem;flex-wrap:wrap;">
+          <div>
+            <div class="ksp-beaker">
+              <div class="beaker-rim"><div class="beaker-spout"></div></div>
+              <div class="beaker-body">
+                <div class="beaker-liquid"></div>
+                <div class="beaker-precip"></div>
+              </div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:4px">saturated solution</div>
+          </div>
+          <div style="flex:1;min-width:180px">
+            <div class="ion-dots">
+              <div class="ion-dot pos">A⁺</div>
+              <div class="ion-dot neg">B⁻</div>
+              <div class="ion-dot pos">A⁺</div>
+              <div class="ion-dot neg">B⁻</div>
+            </div>
+            <div style="font-size:12.5px;color:var(--text2);line-height:1.6;margin-top:8px">Ions float freely in equilibrium with solid at the bottom. Adding more ions tips the balance — solid forms.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dd-block amber" id="dd-ksp3">
+    <div class="dd-trigger" onclick="toggleDD('ksp3')">
+      <span class="dd-trigger-icon">📖</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Step 3</div>
+        <div class="dd-trigger-title">What is K<sub>sp</sub> and what does it actually measure?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      The <strong>solubility product constant (K<sub>sp</sub>)</strong> is the equilibrium constant for the dissolving reaction at saturation. For a compound AB → A⁺ + B⁻:
+      <code class="eq" style="margin:8px 0">K<sub>sp</sub> = [A⁺] × [B⁻] &nbsp; (at equilibrium / saturation)</code>
+      It is a fixed number for each compound at a given temperature. A <em>very small</em> K<sub>sp</sub> (like 10⁻¹⁰) means almost no ions can coexist dissolved — the compound is extremely insoluble. A <em>large</em> K<sub>sp</sub> means lots of ions can dissolve freely.
+      <br><br><strong>Think of it this way:</strong> K<sub>sp</sub> is the maximum "ion budget" a solution can hold before the solid starts forming. Exceed the budget and the solid crystallises immediately.
+    </div>
+  </div>
+
+  <div class="dd-block mint" id="dd-ksp4">
+    <div class="dd-trigger" onclick="toggleDD('ksp4')">
+      <span class="dd-trigger-icon">💡</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Step 4</div>
+        <div class="dd-trigger-title">Why do precipitates form when you mix two solutions?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      When you mix two solutions containing different ions, you suddenly have all four types of ions in the same solution. For every possible cation–anion pair, the system checks: does [A⁺] × [B⁻] exceed K<sub>sp</sub> for that compound?
+      <br><br>If yes → the solution is "supersaturated" with respect to that compound → it immediately precipitates out as solid to bring concentrations back below K<sub>sp</sub>. With very insoluble compounds (tiny K<sub>sp</sub>), this happens the instant the two solutions touch.
+      <code class="eq" style="margin-top:8px">Ag⁺ + Cl⁻ → AgCl ↓ &nbsp; K<sub>sp</sub>(AgCl) ≈ 1.8×10⁻¹⁰ — extremely insoluble</code>
+    </div>
+  </div>
+
+  <div class="dd-block lav" id="dd-ksp5">
+    <div class="dd-trigger" onclick="toggleDD('ksp5')">
+      <span class="dd-trigger-icon">★</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Exam shortcut</div>
+        <div class="dd-trigger-title">The "will it precipitate?" test — step by step</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      <ol style="list-style:decimal;padding-left:1.2rem;font-size:13.5px;line-height:1.75;color:var(--text)">
+        <li>Write out all ions present after mixing both solutions.</li>
+        <li>List every possible cation–anion combination.</li>
+        <li>For each pair: is that compound soluble or insoluble? (Use solubility rules below.)</li>
+        <li>If any combination is insoluble → precipitation occurs. Write the net ionic equation.</li>
+        <li><strong>Key insight:</strong> you don't need to know the exact K<sub>sp</sub> value — the solubility rules encode which combinations are "too insoluble" in practice.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="dd-block coral" id="dd-ksp6">
+    <div class="dd-trigger" onclick="toggleDD('ksp6')">
+      <span class="dd-trigger-icon">⚠</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Common mistake</div>
+        <div class="dd-trigger-title">K<sub>sp</sub> is not the same as solubility</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      K<sub>sp</sub> measures the equilibrium ion product. Solubility is how much of the compound actually dissolves (in mol/L). They're related but not the same thing — you can't directly compare K<sub>sp</sub> values across compounds with different formulas (like AB vs A₂B) without doing the maths first. A compound with a higher K<sub>sp</sub> is <em>generally</em> more soluble, but this breaks down when the formulas differ.
+    </div>
+  </div>
+
+  <!-- Solubility rules -->
+  <div class="sec-label">Solubility rules — quick reference</div>
+  <div class="legend-row">
+    <span><span class="dot sol"></span>Always soluble</span>
+    <span><span class="dot insol"></span>Insoluble (precipitates)</span>
+    <span><span class="dot partial"></span>Exceptions apply</span>
+  </div>
+  <div class="rule-grid" id="rule-grid"></div>
+
+  <!-- Interactive checker -->
+  <div class="sec-label">Will it precipitate? — interactive checker</div>
+  <div class="checker-wrap">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5;">Mix any cation and anion below. The checker applies solubility rules and explains the result.</p>
+    <div class="checker-row">
+      <span class="checker-label">Cation:</span>
+      <select class="chem-select" id="cat-sel" onchange="checkPrecip()">
+        <option value="Na">Na⁺</option><option value="K">K⁺</option>
+        <option value="Ag">Ag⁺</option><option value="Ba">Ba²⁺</option>
+        <option value="Pb">Pb²⁺</option><option value="Ca">Ca²⁺</option>
+        <option value="Fe">Fe²⁺/³⁺</option><option value="Cu">Cu²⁺</option>
+      </select>
+      <span class="checker-label">Anion:</span>
+      <select class="chem-select" id="an-sel" onchange="checkPrecip()">
+        <option value="NO3">NO₃⁻</option><option value="Cl">Cl⁻</option>
+        <option value="SO4">SO₄²⁻</option><option value="OH">OH⁻</option>
+        <option value="CO3">CO₃²⁻</option><option value="PO4">PO₄³⁻</option>
+        <option value="S">S²⁻</option>
+      </select>
+    </div>
+    <div id="precip-result" class="callout c-mint" style="margin-bottom:0">Select ions above to check.</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB: CORE ORGANIC REACTIONS
+     ============================================================ -->
+<div id="tab-organic" class="tab-section" data-macro="deepdive">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Chemistry Deep Dive · Concept 3 of 3</div>
+    <div class="sec-title">Core Organic Reactions: Alkanes, Alcohols &amp; Esters</div>
+    <div class="sec-objective">Understand the three main organic families you'll encounter, what makes them chemically different, and how to balance and predict their key reactions.</div>
+  </div>
+
+  <!-- Family foundations -->
+  <div class="sec-label">The three families — know these first</div>
+
+  <div class="dd-block" id="dd-org-families">
+    <div class="dd-trigger" onclick="toggleDD('org-families')">
+      <span class="dd-trigger-icon">📖</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Foundation</div>
+        <div class="dd-trigger-title">What makes organic families different from each other?</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      Organic molecules are all built around carbon chains. The key difference between families is the <strong>functional group</strong> — the part of the molecule that determines how it reacts. You don't need to memorise the whole molecule; spot the functional group and you know the reaction type.
+      <div class="family-cards" style="margin-top:12px">
+        <div class="fam-card" style="border-color:var(--sky-mid)">
+          <div class="fam-card-title">Alkanes <span class="fam-formula" style="background:var(--sky-light);color:var(--sky)">CₙH₂ₙ₊₂</span></div>
+          <div class="fam-sub">Pure carbon–hydrogen chains with only single bonds. No functional group — completely non-polar. Methane, ethane, propane, butane...</div>
+          <div class="fam-clue" style="background:var(--sky-light);color:var(--sky)">Spot it: only C and H, single bonds everywhere</div>
+        </div>
+        <div class="fam-card" style="border-color:var(--mint-mid)">
+          <div class="fam-card-title">Alcohols <span class="fam-formula" style="background:var(--mint-light);color:var(--mint)">–OH group</span></div>
+          <div class="fam-sub">Alkane chain with one –OH (hydroxyl) group. This one oxygen atom changes how the molecule burns. Ethanol (C₂H₅OH) is the key example.</div>
+          <div class="fam-clue" style="background:var(--mint-light);color:var(--mint)">Spot it: formula ends in –OH</div>
+        </div>
+        <div class="fam-card" style="border-color:var(--amber-mid)">
+          <div class="fam-card-title">Esters <span class="fam-formula" style="background:var(--amber-light);color:var(--amber)">–COO– linkage</span></div>
+          <div class="fam-sub">Formed from carboxylic acid + alcohol. The –COO– linkage gives esters their fruity smell. Esterification is reversible.</div>
+          <div class="fam-clue" style="background:var(--amber-light);color:var(--amber)">Spot it: two O atoms, –COO– in the middle</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key rules accordions -->
+  <div class="dd-block mint" id="dd-org-rule1">
+    <div class="dd-trigger" onclick="toggleDD('org-rule1')">
+      <span class="dd-trigger-icon">💡</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Golden rule</div>
+        <div class="dd-trigger-title">The order for balancing organic combustion: C → H → O</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      For <em>any</em> hydrocarbon or oxygen-containing organic compound burning in oxygen, always follow this order:
+      <ol style="list-style:decimal;padding-left:1.2rem;font-size:13.5px;line-height:1.9;color:var(--text);margin-top:8px">
+        <li>Balance <strong>C</strong> first — each C atom produces one CO₂</li>
+        <li>Balance <strong>H</strong> next — every 2 H atoms produce one H₂O</li>
+        <li>Balance <strong>O</strong> last — count all O atoms needed on the right, subtract any O in the fuel, divide by 2 for O₂</li>
+        <li>Clear any fractions by multiplying all coefficients by 2</li>
+      </ol>
+      O is always last because it appears in both products (CO₂ and H₂O) and can only be fixed once you know how many of each product you need.
+    </div>
+  </div>
+
+  <div class="dd-block amber" id="dd-org-rule2">
+    <div class="dd-trigger" onclick="toggleDD('org-rule2')">
+      <span class="dd-trigger-icon">⚠</span>
+      <div style="flex:1">
+        <div class="dd-trigger-label">Key trick — very commonly tested</div>
+        <div class="dd-trigger-title">Why alcohols need special oxygen accounting</div>
+      </div>
+      <span class="dd-caret">▼</span>
+    </div>
+    <div class="dd-body">
+      An alcohol molecule already contains one oxygen atom (in the –OH group). That oxygen ends up in the products (CO₂ or H₂O). So when you calculate how much O₂ you need to add from outside, you must <strong>subtract 1</strong> for the oxygen already present in the alcohol.
+      <br><br>Forgetting this subtraction is one of the most common mistakes in organic balancing — it gives you one too many O₂ on the left.
+      <code class="eq" style="margin-top:10px">C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O</code>
+      <div style="font-size:12.5px;color:var(--amber);margin-top:4px">O needed on right: 4+3=7. O in alcohol: 1. Extra O needed: 6 → 3O₂ ✓</div>
+    </div>
+  </div>
+
+  <!-- Reaction cards -->
+  <div class="sec-label">Reaction types — click to expand each one</div>
+  <div class="rx-grid" id="rx-grid"></div>
+  <div id="rx-detail-area"></div>
+
+  <!-- O2 calculator -->
+  <div class="sec-label">O₂ coefficient calculator</div>
+  <div class="calc-wrap">
+    <div class="calc-row">
+      <span class="calc-label">Molecule</span>
+      <select class="chem-select" id="mol-type" onchange="calcO2()">
+        <option value="alkane">Alkane (CₙH₂ₙ₊₂)</option>
+        <option value="alkene">Alkene (CₙH₂ₙ)</option>
+        <option value="alcohol">Alcohol (CₙH₂ₙ₊₁OH)</option>
+        <option value="custom">Custom (enter C, H, O)</option>
+      </select>
+    </div>
+    <div id="n-row" class="calc-row">
+      <span class="calc-label">n (carbons)</span>
+      <input class="calc-input" type="number" id="n-val" value="2" min="1" max="20" oninput="calcO2()">
+    </div>
+    <div id="custom-row" class="calc-row" style="display:none">
+      <span class="calc-label">C</span><input class="calc-input" type="number" id="c-val" value="2" min="1" oninput="calcO2()" style="width:48px">
+      <span class="calc-label" style="min-width:20px">H</span><input class="calc-input" type="number" id="h-val" value="6" min="1" oninput="calcO2()" style="width:48px">
+      <span class="calc-label" style="min-width:20px">O</span><input class="calc-input" type="number" id="o-val" value="1" min="0" oninput="calcO2()" style="width:48px">
+    </div>
+    <div class="calc-result" id="calc-result">—</div>
+  </div>
+</div>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <span class="footer-text">Chemistry · Balancing Equations · Intermediate</span>
+  <span class="footer-logo">
+    <span class="flask-icon"></span>
+    Built with Claude
+  </span>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT — ALL DATA AND LOGIC
+     ============================================================ -->
+<script>
+// ============================================================
+// DATA — Session Plan
+// ============================================================
+const planData = [
+  {
+    time: '0–5 min',
+    title: 'Foundation: conservation of mass',
+    badges: ['concept'],
+    desc: 'Quick recap of the core law behind all balancing.',
+    notes: `
+      <div class="callout c-mint" style="margin-top:8px">
+        <span class="callout-label">Core idea</span>
+        Atoms are never created or destroyed in a chemical reaction — only rearranged. This is Lavoisier's Law of Conservation of Mass. Every atom on the left side of the arrow must appear on the right side.
+      </div>
+      <ul class="blist mt1">
+        <li>Fix imbalances with <strong>coefficients</strong> (big numbers in front), never subscripts inside formulas.</li>
+        <li>Changing a subscript changes the substance entirely — H₂O and H₂O₂ are completely different compounds.</li>
+        <li>Balancing order: tackle the element that appears in the fewest compounds first; leave H and O for last.</li>
+      </ul>
+      <div class="callout c-coral" style="margin-top:8px">
+        <span class="callout-label">Common mistake</span>
+        Writing 4H₂O as H₈O₄ — you cannot change subscripts! Only coefficients.
+      </div>
+      <code class="eq">2H₂ + O₂ → 2H₂O &nbsp; (the 2 in front is a coefficient — correct ✓)</code>`
+  },
+  {
+    time: '5–12 min',
+    title: 'Drills 1–4 · Synthesis and decomposition',
+    badges: ['drills'],
+    desc: 'Alternate one synthesis, one decomposition question.',
+    notes: `
+      <ul class="blist amber mt1">
+        <li><strong>Synthesis (A + B → AB):</strong> two or more substances combine into one product. Common pattern: metal + nonmetal → ionic salt.</li>
+        <li><strong>Decomposition (AB → A + B):</strong> one compound breaks into simpler substances. Often triggered by heat, light, or electricity.</li>
+        <li>Thermal decomposition of carbonates: MCO₃ → MO + CO₂ (M = any metal). This pattern appears often in exams.</li>
+      </ul>
+      <div class="callout c-lav" style="margin-top:8px">
+        <span class="callout-label">Why interleave these two?</span>
+        Synthesis and decomposition are mirror images. Practising them together trains your brain to spot the direction of the reaction, not just balance numbers.
+      </div>
+      <code class="eq">2Na + Cl₂ → 2NaCl &nbsp;|&nbsp; CaCO₃ → CaO + CO₂</code>`
+  },
+  {
+    time: '12–18 min',
+    title: 'Concept break: reaction type recognition',
+    badges: ['concept'],
+    desc: 'Identify reaction type before balancing — it tells you how many products to expect.',
+    notes: `
+      <ul class="blist sky mt1">
+        <li><strong>Synthesis:</strong> A + B → AB (combine)</li>
+        <li><strong>Decomposition:</strong> AB → A + B (break apart)</li>
+        <li><strong>Single replacement:</strong> A + BC → AC + B (one element swaps in)</li>
+        <li><strong>Double replacement:</strong> AB + CD → AD + CB (ion pairs swap partners)</li>
+        <li><strong>Combustion:</strong> fuel + O₂ → CO₂ + H₂O (always produces these products when complete)</li>
+      </ul>
+      <div class="callout c-mint" style="margin-top:8px">
+        <span class="callout-label">Exam shortcut — combustion</span>
+        For CₙHₘ: CO₂ coefficient = n, H₂O coefficient = m/2, O₂ coefficient = n + m/4. If O₂ comes out as a fraction, multiply every coefficient by 2 to clear it.
+      </div>`
+  },
+  {
+    time: '18–26 min',
+    title: 'Drills 5–10 · Mixed reaction types',
+    badges: ['drills'],
+    desc: 'Combustion, single-replacement, double-replacement — randomised order.',
+    notes: `
+      <ul class="blist sky mt1">
+        <li><strong>Single replacement check:</strong> only write the reaction if the incoming element is higher on the activity series. If not, no reaction occurs — write "no reaction".</li>
+        <li><strong>Double replacement precipitation check:</strong> if either product is insoluble (check solubility rules), the reaction proceeds and you get a precipitate (↓).</li>
+        <li>Always check you've swapped the correct pairs in double replacement: cation of first compound bonds with anion of second, vice versa.</li>
+      </ul>
+      <code class="eq">Zn + CuSO₄ → ZnSO₄ + Cu &nbsp;(Zn is above Cu ✓)</code>
+      <code class="eq">AgNO₃ + NaCl → AgCl↓ + NaNO₃ &nbsp;(AgCl insoluble ✓)</code>`
+  },
+  {
+    time: '26–31 min',
+    title: 'Concept break: polyatomic ions as units',
+    badges: ['concept'],
+    desc: 'Treat SO₄²⁻, NO₃⁻, OH⁻ as single blocks when they appear intact on both sides.',
+    notes: `
+      <ul class="blist mt1">
+        <li>Key polyatomic ions: SO₄²⁻ (sulfate) · NO₃⁻ (nitrate) · OH⁻ (hydroxide) · CO₃²⁻ (carbonate) · PO₄³⁻ (phosphate) · NH₄⁺ (ammonium)</li>
+        <li>If the ion appears <em>unchanged</em> on both sides, count it as one unit — much faster than counting individual atoms.</li>
+        <li>Parentheses multiply: Ca(OH)₂ = 2 OH units; Al₂(SO₄)₃ = 3 SO₄ units.</li>
+        <li>Don't use the shortcut if the ion splits across different products — count atoms individually then.</li>
+      </ul>
+      <div class="callout c-amber" style="margin-top:8px">
+        <span class="callout-label">What to notice in exam questions</span>
+        Reactions involving metal hydroxides, sulfates, carbonates, or phosphates almost always benefit from the polyatomic-unit trick. Spot these ions first before you start counting.
+      </div>
+      <code class="eq">2Al(OH)₃ + 3H₂SO₄ → Al₂(SO₄)₃ + 6H₂O</code>`
+  },
+  {
+    time: '31–38 min',
+    title: 'Drills 11–25 · Polyatomic ions + organic',
+    badges: ['drills', 'organic'],
+    desc: 'Interleave one organic, one inorganic. Switch strategies consciously.',
+    notes: `
+      <ul class="blist mt1">
+        <li>Organic combustion: always C → H → O. O₂ goes last, always.</li>
+        <li>Alcohols: subtract the 1 oxygen already in the molecule before calculating O₂ needed.</li>
+        <li>Fermentation: C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂. The 2s come from dividing 6 carbons into 3 lots of 2. No O₂ added — all oxygen comes from glucose.</li>
+        <li>Cracking: no oxygen involved. Just conserve C and H. An alkene (double bond) always forms as one product.</li>
+      </ul>
+      <div class="callout c-lav" style="margin-top:8px">
+        <span class="callout-label">Why this block is the hardest</span>
+        You're switching between two completely different solving strategies (inorganic vs organic) every question. This is deliberate — it's exactly what happens in an exam. The discomfort means your brain is working hard.
+      </div>`
+  },
+  {
+    time: '38–40 min',
+    title: 'Review loop — mastery check',
+    badges: ['review'],
+    desc: 'Reattempt every missed question before stopping.',
+    notes: `
+      <div class="callout c-mint" style="margin-top:8px">
+        <span class="callout-label">Why this works</span>
+        Simply reading the correct answer is passive — your brain stores almost nothing. Attempting the question again forces active retrieval, which builds a much stronger memory trace. This is spaced repetition in action.
+      </div>
+      <ul class="blist amber mt1">
+        <li>For each missed question, identify the <em>root cause</em>: wrong atom count? Wrong order? Forgot a polyatomic unit? Misidentified reaction type?</li>
+        <li>After this session: wait 24 hours, then redo only the missed questions once more. That second spacing interval locks in long-term memory.</li>
+        <li>If you miss the same question twice: that's a signal to go back to the concept section and re-read the core idea.</li>
+      </ul>`
+  }
+];
+
+// ============================================================
+// DATA — Solubility rules
+// ============================================================
+const solRules = [
+  { ion: 'NO₃⁻ nitrate',    cls: 'sol',    txt: 'All nitrates are soluble — no exceptions.' },
+  { ion: 'CH₃COO⁻ acetate', cls: 'sol',    txt: 'All acetates are soluble.' },
+  { ion: 'Cl⁻  Br⁻  I⁻',   cls: 'sol',    txt: 'Soluble except with Ag⁺, Pb²⁺, Hg₂²⁺.' },
+  { ion: 'SO₄²⁻ sulfate',   cls: 'sol',    txt: 'Soluble except BaSO₄, PbSO₄, CaSO₄.' },
+  { ion: 'CO₃²⁻ carbonate', cls: 'insol',  txt: 'Insoluble except Na⁺, K⁺, NH₄⁺ salts.' },
+  { ion: 'OH⁻ hydroxide',   cls: 'insol',  txt: 'Insoluble except Group 1, Ba²⁺, Sr²⁺.' },
+  { ion: 'PO₄³⁻ phosphate', cls: 'insol',  txt: 'Insoluble except Na⁺, K⁺, NH₄⁺ salts.' },
+  { ion: 'S²⁻ sulfide',     cls: 'insol',  txt: 'Insoluble except Group 1, 2 metals and NH₄⁺.' },
+];
+
+// ============================================================
+// DATA — Organic reaction types
+// ============================================================
+const rxTypes = [
+  {
+    id: 'complete', title: 'Complete combustion', sub: 'Full O₂ → CO₂ + H₂O only',
+    tags: [{ t: 'exothermic', c: 'ta' }, { t: 'complete O₂', c: 'tg' }],
+    bullets: [
+      { t: '<strong>What\'s happening:</strong> every C–H and C–C bond is fully oxidised. Carbon becomes CO₂, hydrogen becomes H₂O. Requires excess oxygen.' },
+      { t: '<strong>Why always exothermic:</strong> C=O and O–H bonds in the products are far stronger than C–H and C–C bonds in the fuel. The system releases energy settling into those more stable bonds.' },
+      { t: '<strong>Balancing order:</strong> C first (→ CO₂) · H next (→ H₂O) · O last (count all O needed, divide by 2 for O₂). Clear fractions by doubling all coefficients.' },
+      { t: '<strong>What to notice in exams:</strong> the question will give you the unbalanced equation. Spot whether it\'s complete (CO₂ + H₂O) or incomplete (CO + H₂O or just C).' },
+    ],
+    eq: 'CH₄ + 2O₂ → CO₂ + 2H₂O  |  C₃H₈ + 5O₂ → 3CO₂ + 4H₂O'
+  },
+  {
+    id: 'incomplete', title: 'Incomplete combustion', sub: 'Limited O₂ → CO or soot',
+    tags: [{ t: 'limited O₂', c: 'tr' }, { t: 'toxic CO', c: 'tr' }],
+    bullets: [
+      { t: '<strong>What\'s happening:</strong> not enough O₂ to fully oxidise all carbon. Some carbon becomes CO (carbon monoxide) or stays as solid soot (C).' },
+      { t: '<strong>Why CO is dangerous:</strong> it binds to haemoglobin about 250× more tightly than O₂ — blocking oxygen transport. Colourless and odourless, so you can\'t detect it without a sensor.' },
+      { t: '<strong>Balancing difference:</strong> CO has only 1 oxygen per carbon instead of 2. So you need less O₂ on the left. Otherwise same C → H → O order.' },
+      { t: '<strong>Real-world signal:</strong> yellow/orange flames + black smoke = incomplete combustion. Blue flame = complete.' },
+    ],
+    eq: '2C₄H₁₀ + 9O₂ → 8CO + 10H₂O  (compare: 13O₂ for complete combustion)'
+  },
+  {
+    id: 'ferment', title: 'Fermentation', sub: 'Glucose → ethanol + CO₂',
+    tags: [{ t: 'biological', c: 'tg' }, { t: 'anaerobic', c: 'tp' }],
+    bullets: [
+      { t: '<strong>What\'s happening:</strong> yeast enzymes break glucose without oxygen (anaerobic). The 6-carbon glucose ring splits into two 2-carbon ethanol molecules, releasing two CO₂ as a byproduct.' },
+      { t: '<strong>Why the 2s appear:</strong> glucose has 6 carbons, ethanol has 2. You need exactly 2 ethanol to account for all 6 carbons. The 2 CO₂ follow automatically from balancing.' },
+      { t: '<strong>No O₂ added:</strong> all oxygen in the products comes from glucose itself. This is the whole point of anaerobic respiration — no oxygen available.' },
+      { t: '<strong>Low energy yield:</strong> ethanol still contains usable chemical energy. Complete combustion of glucose releases about 3× more energy than fermentation.' },
+    ],
+    eq: 'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂  |  C:6=4+2 ✓  H:12=12 ✓  O:6=2+4 ✓'
+  },
+  {
+    id: 'ester', title: 'Esterification', sub: 'Acid + alcohol → ester + H₂O',
+    tags: [{ t: 'reversible', c: 'tb' }, { t: 'acid catalyst', c: 'tp' }],
+    bullets: [
+      { t: '<strong>What\'s happening:</strong> the –OH from the carboxylic acid and the H from the alcohol\'s –OH leave together as water. The remaining fragments bond via a C–O–C ester linkage.' },
+      { t: '<strong>Why it\'s reversible:</strong> water can attack the ester bond and break it back into acid + alcohol (hydrolysis). An acid catalyst speeds both directions. Equilibrium sits around 60–70% ester.' },
+      { t: '<strong>Balancing:</strong> simple esterifications are usually 1:1:1:1. Verify atom by atom — C, H, and O must each balance.' },
+      { t: '<strong>Real-world use:</strong> fruit flavours and fragrances are esters. Ethyl acetate (nail varnish remover), isoamyl acetate (banana), benzyl acetate (jasmine).' },
+    ],
+    eq: 'CH₃COOH + CH₃OH ⇌ CH₃COOCH₃ + H₂O  (H⁺ catalyst, reversible)'
+  },
+  {
+    id: 'crack', title: 'Cracking', sub: 'Large alkane → smaller alkane + alkene',
+    tags: [{ t: 'industrial', c: 'ta' }, { t: 'high temp', c: 'tr' }],
+    bullets: [
+      { t: '<strong>What\'s happening:</strong> long-chain alkanes from crude oil are broken into shorter, more useful molecules using heat or a zeolite catalyst.' },
+      { t: '<strong>Why an alkene always forms:</strong> when a C–C bond breaks, one fragment is left short of hydrogen. It forms a double bond (alkene) to satisfy valency. Short alkanes + alkenes are more valuable as fuels and chemical feedstocks.' },
+      { t: '<strong>Balancing rule:</strong> no O₂ involved. Just count C and H — they must be conserved exactly. One long molecule breaks into two or more shorter ones.' },
+      { t: '<strong>Multiple pathways:</strong> the same alkane can crack in many different ways. The equation you balance is one valid pathway out of several.' },
+    ],
+    eq: 'C₁₀H₂₂ → C₄H₁₀ + 3C₂H₄  |  C:10=4+6 ✓  H:22=10+12 ✓'
+  },
+  {
+    id: 'alcohol', title: 'Alcohol combustion', sub: 'Built-in O — adjust your O₂ count',
+    tags: [{ t: 'key trick', c: 'tg' }, { t: 'O₂ accounting', c: 'ta' }],
+    bullets: [
+      { t: '<strong>The core idea:</strong> an alcohol molecule (R–OH) already contains one oxygen atom. That oxygen will end up in the products (CO₂ or H₂O). You need less O₂ from outside.' },
+      { t: '<strong>Step-by-step:</strong> (1) balance C → n CO₂. (2) balance H → (total H ÷ 2) H₂O. (3) count all O needed on the right. (4) subtract 1 for the O already in the alcohol. (5) divide remaining O by 2 for the O₂ coefficient.' },
+      { t: '<strong>What to notice:</strong> if the formula ends in –OH, you must do the O correction. If it\'s a plain alkane (CₙH₂ₙ₊₂), no correction needed.' },
+    ],
+    eq: 'C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O  |  O needed:7, in alcohol:1, from O₂:6 → 3O₂ ✓'
+  }
+];
+
+// ============================================================
+// DATA — Metals (activity series with periodic table context)
+// ============================================================
+const metals = [
+  { sym:'K',  name:'Potassium',  h:96, color:'#f4b848', grp:'Group 1',  period:4, family:'alkali',     famColor:'#f4c848', note:'Reacts violently with cold water — ignites spontaneously. Stored in oil to prevent air contact.' },
+  { sym:'Na', name:'Sodium',     h:90, color:'#f4c848', grp:'Group 1',  period:3, family:'alkali',     famColor:'#f4c848', note:'Reacts vigorously with water, releasing H₂ and producing NaOH solution. Very reactive.' },
+  { sym:'Ca', name:'Calcium',    h:83, color:'#f4a870', grp:'Group 2',  period:4, family:'alkaline',   famColor:'#f4a870', note:'Reacts with cold water, less violently than Na. Turns lime water milky (forms Ca(OH)₂).' },
+  { sym:'Mg', name:'Magnesium',  h:76, color:'#f4a888', grp:'Group 2',  period:3, family:'alkaline',   famColor:'#f4a870', note:'Reacts slowly with cold water but rapidly with steam. Burns with brilliant white flame.' },
+  { sym:'Al', name:'Aluminium',  h:69, color:'#b0c8e8', grp:'Group 13', period:3, family:'p-block',    famColor:'#b0c8e8', note:'Passivation layer of Al₂O₃ masks true reactivity — appears less reactive than it is.' },
+  { sym:'Zn', name:'Zinc',       h:62, color:'#c0b8f0', grp:'Group 12', period:4, family:'transition', famColor:'#c0b8f0', note:'Displaces Fe, Ni, Sn, Pb, Cu, Ag, Au from solution. Reacts with dilute acids releasing H₂.' },
+  { sym:'Fe', name:'Iron',       h:55, color:'#c8c0e8', grp:'Group 8',  period:4, family:'transition', famColor:'#c0b8f0', note:'Displaces Ni, Sn, Pb, Cu, Ag, Au. Does NOT displace Zn or metals above it.' },
+  { sym:'Ni', name:'Nickel',     h:48, color:'#d0c8e0', grp:'Group 10', period:4, family:'transition', famColor:'#c0b8f0', note:'Moderate reactivity. Reacts with dilute acids but not cold water.' },
+  { sym:'Sn', name:'Tin',        h:42, color:'#b8b8b8', grp:'Group 14', period:5, family:'p-block',    famColor:'#b0c8e8', note:'Displaces Pb, Cu, Ag, Au. Reacts slowly with strong acids.' },
+  { sym:'Pb', name:'Lead',       h:36, color:'#a0a8a0', grp:'Group 14', period:6, family:'p-block',    famColor:'#b0c8e8', note:'Displaces Cu, Ag, Au. PbCl₂ passivation layer slows further reaction with HCl.' },
+  { sym:'H',  name:'Hydrogen',   h:30, color:'#9090c0', grp:'Benchmark',period:1, family:'benchmark',  famColor:'#9090c0', note:'THE BENCHMARK — metals above H react with dilute acids and produce H₂ gas. Metals below cannot.' },
+  { sym:'Cu', name:'Copper',     h:24, color:'#e8a848', grp:'Group 11', period:4, family:'transition', famColor:'#c0b8f0', note:'Will NOT react with dilute HCl or H₂SO₄. Only displaces Ag and Au. Tarnishes slowly.' },
+  { sym:'Ag', name:'Silver',     h:17, color:'#d0d0d0', grp:'Group 11', period:5, family:'transition', famColor:'#c0b8f0', note:'Very low reactivity. Only displaces Au. Slow surface tarnishing via oxidation.' },
+  { sym:'Au', name:'Gold',       h:11, color:'#f0c048', grp:'Group 11', period:6, family:'transition', famColor:'#c0b8f0', note:'Bottom of the series. Won\'t dissolve in any single acid (needs aqua regia: HNO₃ + HCl). Stable for millennia.' },
+];
+
+const familyInfo = [
+  { key:'alkali',     label:'Alkali metals (Gp 1)',   color:'#f4c848' },
+  { key:'alkaline',   label:'Alkaline earth (Gp 2)',  color:'#f4a870' },
+  { key:'transition', label:'Transition metals',      color:'#c0b8f0' },
+  { key:'p-block',    label:'Post-transition / p-block', color:'#b0c8e8' },
+  { key:'benchmark',  label:'H benchmark',            color:'#9090c0' },
+];
+
+// ============================================================
+// DATA — Precipitation checker
+// ============================================================
+const precipRules = {
+  Na: { NO3:'sol', Cl:'sol', SO4:'sol', OH:'sol', CO3:'sol', PO4:'sol', S:'sol' },
+  K:  { NO3:'sol', Cl:'sol', SO4:'sol', OH:'sol', CO3:'sol', PO4:'sol', S:'sol' },
+  Ag: { NO3:'sol', Cl:'insol', SO4:'partial', OH:'insol', CO3:'insol', PO4:'insol', S:'insol' },
+  Ba: { NO3:'sol', Cl:'sol', SO4:'insol', OH:'sol', CO3:'insol', PO4:'insol', S:'sol' },
+  Pb: { NO3:'sol', Cl:'insol', SO4:'insol', OH:'insol', CO3:'insol', PO4:'insol', S:'insol' },
+  Ca: { NO3:'sol', Cl:'sol', SO4:'partial', OH:'partial', CO3:'insol', PO4:'insol', S:'sol' },
+  Fe: { NO3:'sol', Cl:'sol', SO4:'sol', OH:'insol', CO3:'insol', PO4:'insol', S:'insol' },
+  Cu: { NO3:'sol', Cl:'sol', SO4:'sol', OH:'insol', CO3:'insol', PO4:'insol', S:'insol' },
+};
+
+// ============================================================
+// DATA — Standard 25 Drills
+// ============================================================
+const drills = [
+  {id:1,cat:'inorganic',type:'Synthesis',diff:'easy',concept:'conservation of mass',q:'H₂ + O₂ → H₂O',hint:'Balance H first — you need 4 H atoms on the left to match 2 H₂O on the right.',ans:'2H₂ + O₂ → 2H₂O',explain:'2H₂ gives 4 H; 2H₂O needs 4 H ✓. O₂ gives 2 O; 2H₂O needs 2 O ✓.'},
+  {id:2,cat:'inorganic',type:'Decomposition',diff:'easy',concept:'conservation of mass',q:'H₂O₂ → H₂O + O₂',hint:'Start with O₂ — its coefficient forces the H₂O₂ coefficient.',ans:'2H₂O₂ → 2H₂O + O₂',explain:'2H₂O₂ = 4H, 4O. Right side: 2H₂O = 4H, 2O; + O₂ = 2O → total 4O ✓.'},
+  {id:3,cat:'inorganic',type:'Synthesis',diff:'easy',concept:'conservation of mass',q:'N₂ + H₂ → NH₃',hint:'Fix N first (N₂ appears in one product). Then adjust H.',ans:'N₂ + 3H₂ → 2NH₃',explain:'2NH₃ = 2N ✓ and 6H. 3H₂ = 6H ✓.'},
+  {id:4,cat:'inorganic',type:'Decomposition',diff:'easy',concept:'reaction types',q:'KClO₃ → KCl + O₂',hint:'Balance K and Cl as anchors, then handle O last.',ans:'2KClO₃ → 2KCl + 3O₂',explain:'2KClO₃ = 2K, 2Cl, 6O. 2KCl = 2K, 2Cl; 3O₂ = 6O ✓.'},
+  {id:5,cat:'inorganic',type:'Combustion',diff:'medium',concept:'reaction types',q:'CH₄ + O₂ → CO₂ + H₂O',hint:'C first, then H, fix O last.',ans:'CH₄ + 2O₂ → CO₂ + 2H₂O',explain:'1C→1CO₂. 4H→2H₂O. O needed: 2+2=4 → 2O₂ ✓.'},
+  {id:6,cat:'inorganic',type:'Single replacement',diff:'medium',concept:'reaction types',q:'Fe + HCl → FeCl₂ + H₂',hint:'Balance Cl first — how many Cl does FeCl₂ need?',ans:'Fe + 2HCl → FeCl₂ + H₂',explain:'FeCl₂ needs 2 Cl → 2 HCl. 2 HCl gives 2 H → H₂. 1 Fe each side ✓.'},
+  {id:7,cat:'inorganic',type:'Double replacement',diff:'medium',concept:'reaction types',q:'AgNO₃ + NaCl → AgCl + NaNO₃',hint:'All coefficients are 1 — verify atom by atom.',ans:'AgNO₃ + NaCl → AgCl + NaNO₃',explain:'Already balanced: 1Ag, 1NO₃, 1Na, 1Cl each side ✓.'},
+  {id:8,cat:'inorganic',type:'Combustion',diff:'medium',concept:'reaction types',q:'C₃H₈ + O₂ → CO₂ + H₂O',hint:'C → H → O.',ans:'C₃H₈ + 5O₂ → 3CO₂ + 4H₂O',explain:'3C→3CO₂. 8H→4H₂O. O: 6+4=10 → 5O₂ ✓.'},
+  {id:9,cat:'inorganic',type:'Single replacement',diff:'medium',concept:'reaction types',q:'Zn + H₂SO₄ → ZnSO₄ + H₂',hint:'SO₄ stays intact on both sides — count it as one unit.',ans:'Zn + H₂SO₄ → ZnSO₄ + H₂',explain:'Already balanced. 1Zn, 1SO₄, 2H each side ✓.'},
+  {id:10,cat:'inorganic',type:'Double replacement',diff:'medium',concept:'reaction types',q:'BaCl₂ + Na₂SO₄ → BaSO₄ + NaCl',hint:'Count Na on the left — you need to adjust NaCl.',ans:'BaCl₂ + Na₂SO₄ → BaSO₄ + 2NaCl',explain:'2Na left → 2NaCl. 2Cl in BaCl₂ → 2NaCl ✓. Ba and SO₄: 1:1 ✓.'},
+  {id:11,cat:'inorganic',type:'Polyatomic ions',diff:'medium',concept:'polyatomic ions',q:'Ca(OH)₂ + HCl → CaCl₂ + H₂O',hint:'Ca(OH)₂ has two OH units. Count them as blocks.',ans:'Ca(OH)₂ + 2HCl → CaCl₂ + 2H₂O',explain:'2OH + 2HCl → CaCl₂ + 2H₂O. 2Cl left → CaCl₂ ✓.'},
+  {id:12,cat:'inorganic',type:'Polyatomic ions',diff:'medium',concept:'polyatomic ions',q:'Al(OH)₃ + H₂SO₄ → Al₂(SO₄)₃ + H₂O',hint:'Balance Al first, then SO₄, then H₂O last.',ans:'2Al(OH)₃ + 3H₂SO₄ → Al₂(SO₄)₃ + 6H₂O',explain:'2Al→Al₂. 3SO₄→3H₂SO₄ (6H). 6OH+6H→6H₂O ✓.'},
+  {id:13,cat:'inorganic',type:'Polyatomic ions',diff:'hard',concept:'polyatomic ions',q:'Fe₂O₃ + H₂SO₄ → Fe₂(SO₄)₃ + H₂O',hint:'3 SO₄ on the right drives the H₂SO₄ count.',ans:'Fe₂O₃ + 3H₂SO₄ → Fe₂(SO₄)₃ + 3H₂O',explain:'2Fe each side ✓. 3SO₄→3H₂SO₄ (6H). O check: 3+12=15 left; 12+3=15 right ✓.'},
+  {id:14,cat:'inorganic',type:'Challenge',diff:'hard',concept:'combustion + polyatomics',q:'C₂H₅OH + O₂ → CO₂ + H₂O',hint:'Ethanol has one O already — subtract it from your O₂ tally.',ans:'C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O',explain:'2C→2CO₂. 6H→3H₂O. O needed:7. Alcohol has 1 O. Extra:6 → 3O₂ ✓.'},
+  {id:15,cat:'inorganic',type:'Challenge',diff:'hard',concept:'polyatomic ions',q:'Ca₃(PO₄)₂ + H₂SO₄ → CaSO₄ + H₃PO₄',hint:'Treat PO₄ as a unit. 2 PO₄ on left → 2 H₃PO₄ on right.',ans:'Ca₃(PO₄)₂ + 3H₂SO₄ → 3CaSO₄ + 2H₃PO₄',explain:'2PO₄→2H₃PO₄ (6H). 3Ca→3CaSO₄→3SO₄→3H₂SO₄ (6H ✓).'},
+  {id:16,cat:'organic',type:'Combustion',diff:'easy',concept:'organic combustion',q:'C₂H₆ + O₂ → CO₂ + H₂O  (ethane)',hint:'Use fractions if needed, then multiply by 2 to clear.',ans:'2C₂H₆ + 7O₂ → 4CO₂ + 6H₂O',explain:'2×2C=4→4CO₂. 2×6H=12→6H₂O. O: 8+6=14→7O₂ ✓.'},
+  {id:17,cat:'organic',type:'Combustion',diff:'easy',concept:'organic combustion',q:'C₄H₁₀ + O₂ → CO₂ + H₂O  (butane)',hint:'Try with fraction first (13/2 O₂), then ×2.',ans:'2C₄H₁₀ + 13O₂ → 8CO₂ + 10H₂O',explain:'2×4C=8→8CO₂. 2×10H=20→10H₂O. O: 16+10=26→13O₂ ✓.'},
+  {id:18,cat:'organic',type:'Combustion',diff:'medium',concept:'organic combustion',q:'C₂H₄ + O₂ → CO₂ + H₂O  (ethene)',hint:'Double bond in the molecule doesn\'t affect balancing.',ans:'C₂H₄ + 3O₂ → 2CO₂ + 2H₂O',explain:'2C→2CO₂. 4H→2H₂O. O: 4+2=6→3O₂ ✓.'},
+  {id:19,cat:'organic',type:'Combustion',diff:'medium',concept:'organic combustion',q:'C₆H₆ + O₂ → CO₂ + H₂O  (benzene)',hint:'6 carbons → 6 CO₂. Then balance H, then O.',ans:'2C₆H₆ + 15O₂ → 12CO₂ + 6H₂O',explain:'2×6C=12→12CO₂. 2×6H=12→6H₂O. O: 24+6=30→15O₂ ✓.'},
+  {id:20,cat:'organic',type:'Combustion',diff:'medium',concept:'organic combustion',q:'C₃H₇OH + O₂ → CO₂ + H₂O  (propanol)',hint:'Propanol has one O already in the molecule.',ans:'2C₃H₇OH + 9O₂ → 6CO₂ + 8H₂O',explain:'2×3C=6→6CO₂. 2×8H=16→8H₂O. O needed:20. In 2 propanol:2. Extra:18→9O₂ ✓.'},
+  {id:21,cat:'organic',type:'Fermentation',diff:'medium',concept:'organic reactions',q:'C₆H₁₂O₆ → C₂H₅OH + CO₂  (glucose fermentation)',hint:'Count carbons: 6 in glucose, 2 in ethanol — so you need 2 ethanol + 2 CO₂.',ans:'C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂',explain:'6C: 2×2+2×1=6 ✓. H:12=2×6=12 ✓. O:6=2×1+2×2=6 ✓.'},
+  {id:22,cat:'organic',type:'Esterification',diff:'medium',concept:'organic reactions',q:'CH₃COOH + CH₃OH → CH₃COOCH₃ + H₂O',hint:'Already balanced — verify atom by atom.',ans:'CH₃COOH + CH₃OH → CH₃COOCH₃ + H₂O',explain:'C:2+1=3; 3+0=3 ✓. H:4+4=8; 6+2=8 ✓. O:2+1=3; 2+1=3 ✓.'},
+  {id:23,cat:'organic',type:'Cracking',diff:'hard',concept:'organic reactions',q:'C₈H₁₈ → C₅H₁₂ + ?  (find the missing product)',hint:'Use conservation of C and H to find the missing formula.',ans:'C₈H₁₈ → C₅H₁₂ + C₃H₆',explain:'C: 8=5+3 ✓. H: 18=12+6 ✓. C₃H₆ is propene — an alkene (CₙH₂ₙ).'},
+  {id:24,cat:'organic',type:'Incomplete combustion',diff:'hard',concept:'organic reactions',q:'C₄H₁₀ + O₂ → CO + H₂O  (incomplete combustion)',hint:'CO has one O per C, not two. Balance C, then H, then O.',ans:'2C₄H₁₀ + 9O₂ → 8CO + 10H₂O',explain:'2×4C=8→8CO. 2×10H=20→10H₂O. O: 8+10=18→9O₂ ✓.'},
+  {id:25,cat:'organic',type:'Challenge',diff:'hard',concept:'organic combustion',q:'C₁₂H₂₂O₁₁ + O₂ → CO₂ + H₂O  (sucrose combustion)',hint:'Large molecule — balance C, H, then subtract O already in sucrose.',ans:'C₁₂H₂₂O₁₁ + 12O₂ → 12CO₂ + 11H₂O',explain:'12C→12CO₂. 22H→11H₂O. O needed:24+11=35. In sucrose:11. Extra:24→12O₂ ✓.'},
+];
+
+// ============================================================
+// DATA — Advanced Drills (10 harder questions)
+// ============================================================
+const advDrills = [
+  {
+    id:'a1', diff:'advanced',
+    context:'Metal reactivity reasoning',
+    q:'Magnesium is added to a solution of iron(II) sulfate. Copper is added to a solution of zinc sulfate. Which reaction(s) occur? Explain why.',
+    hint:'Check both against the activity series. A reaction only occurs if the added metal is ABOVE the dissolved metal.',
+    ans:'Only the Mg + FeSO₄ reaction occurs: Mg + FeSO₄ → MgSO₄ + Fe. Copper does NOT displace zinc because Cu is below Zn.',
+    explain:'Mg is above Fe in the activity series → Mg displaces Fe ✓. Cu is below Zn → Cu cannot displace Zn. No reaction. The key is direction: always check which metal is higher.'
+  },
+  {
+    id:'a2', diff:'advanced',
+    context:'Balancing a tricky multi-product equation',
+    q:'Balance: P₄ + O₂ → P₄O₁₀',
+    hint:'P₄ already has 4 P atoms. Count the O atoms needed on the right, then work out O₂.',
+    ans:'P₄ + 5O₂ → P₄O₁₀',
+    explain:'4P on left → 4P in P₄O₁₀ ✓. P₄O₁₀ has 10 O atoms needed. 10 ÷ 2 = 5 O₂ ✓. Straightforward once you notice P₄ is already balanced.'
+  },
+  {
+    id:'a3', diff:'advanced',
+    context:'Halogen displacement — predict the observation',
+    q:'Chlorine water is added to potassium iodide solution, then the mixture is shaken with cyclohexane (an organic layer). What do you observe in the organic layer, and why?',
+    hint:'Cl₂ is above I₂ in the halogen activity series. What does displacement produce? What colour is I₂ in an organic solvent?',
+    ans:'The organic layer turns violet/purple. Cl₂ displaces I⁻ from KI solution, forming I₂. Iodine dissolves in cyclohexane and produces a characteristic violet colour.',
+    explain:'Cl₂ + 2KI → 2KCl + I₂. Cl₂ is more reactive (higher in halogen series) so it oxidises I⁻ to I₂. I₂ is more soluble in the non-polar organic layer than in water — and it gives a vivid violet colour in organic solvents.'
+  },
+  {
+    id:'a4', diff:'advanced',
+    context:'Ksp reasoning — will precipitation occur?',
+    q:'50 mL of 0.002 mol/L AgNO₃ is mixed with 50 mL of 0.002 mol/L NaCl. Ksp(AgCl) = 1.8×10⁻¹⁰. Will a precipitate form? Show your reasoning.',
+    hint:'After mixing, both volumes double — so concentrations halve. Calculate the ion product Q = [Ag⁺][Cl⁻] and compare to Ksp.',
+    ans:'Yes, a precipitate forms. After mixing: [Ag⁺] = [Cl⁻] = 0.001 mol/L. Q = 0.001 × 0.001 = 1×10⁻⁶. Since Q (10⁻⁶) >> Ksp (1.8×10⁻¹⁰), the solution is far supersaturated and AgCl precipitates immediately.',
+    explain:'Key steps: (1) concentrations halve on mixing. (2) Calculate Q = [Ag⁺][Cl⁻]. (3) Compare Q to Ksp. If Q > Ksp → precipitate forms. If Q < Ksp → stays in solution. Here Q is 55,000× larger than Ksp — precipitation is certain and rapid.'
+  },
+  {
+    id:'a5', diff:'advanced',
+    context:'Organic — identify the reaction type and balance',
+    q:'A student observes that burning propan-1-ol in limited oxygen produces a mixture of CO and CO₂, along with water. Write a balanced equation for the production of CO ONLY (incomplete combustion), and explain why this outcome is more likely in a car engine than a laboratory Bunsen burner.',
+    hint:'For incomplete combustion with CO: balance C (→CO), H (→H₂O), then O last.',
+    ans:'2C₃H₇OH + 7O₂ → 6CO + 8H₂O',
+    explain:'2×3C→6CO. 2×8H→8H₂O. O needed: 6+8=14. O in 2 propanol: 2. Extra: 12 → 6O₂... wait: recheck. 2C₃H₇OH: C=6,H=16,O=2. 6CO+8H₂O: C=6✓,H=16✓,O=6+8=14. O from fuel:2, so O₂ must provide 12 → 6O₂. Answer: 2C₃H₇OH + 6O₂ → 6CO + 8H₂O. A car engine has limited airflow and rapid combustion — incomplete combustion is likely. A Bunsen burner in a lab has a controlled air intake that can be fully opened for complete combustion.'
+  },
+  {
+    id:'a6', diff:'advanced',
+    context:'Cracking and homologous series',
+    q:'Decane (C₁₀H₂₂) is cracked to give octane (C₈H₁₈) and one other product. (a) Identify the other product. (b) Is it an alkane or alkene? (c) Why must this be the case?',
+    hint:'Conserve C and H. Then apply the general formula test for alkanes (CₙH₂ₙ₊₂) vs alkenes (CₙH₂ₙ).',
+    ans:'(a) C₂H₄ (ethene). (b) Alkene. (c) C:10=8+2 ✓. H:22=18+4 ✓. C₂H₄ follows CₙH₂ₙ (n=2), which is the alkene formula — 2 fewer H than an alkane (C₂H₆). This must happen because one fragment loses H₂ to form the double bond when the C–C bond breaks.',
+    explain:'Cracking always produces at least one alkene. When a C–C bond breaks, both fragments need to satisfy valency. One becomes an alkane (keeps all its H), the other becomes an alkene (forms a C=C double bond, losing the equivalent of H₂).'
+  },
+  {
+    id:'a7', diff:'advanced',
+    context:'Multi-step precipitation reasoning',
+    q:'A solution contains Ba²⁺, Pb²⁺, and Na⁺ ions. You add sulfate ions (SO₄²⁻) dropwise. Which precipitate forms first, and why? What happens to Na⁺?',
+    hint:'Check the solubility of BaSO₄ and PbSO₄. Both are insoluble — but which has the smaller Ksp?',
+    ans:'BaSO₄ precipitates first (Ksp ≈ 1.1×10⁻¹⁰). PbSO₄ follows (Ksp ≈ 2.5×10⁻⁸, larger). Na₂SO₄ is soluble — Na⁺ remains in solution throughout.',
+    explain:'The compound with the smaller Ksp exceeds its ion product first as SO₄²⁻ is added slowly. BaSO₄ has a much smaller Ksp than PbSO₄, so it forms first. Na⁺ never precipitates with SO₄²⁻ — Na₂SO₄ is always soluble (Group 1 rule).'
+  },
+  {
+    id:'a8', diff:'advanced',
+    context:'Tricky balancing — fractional coefficients',
+    q:'Balance the combustion of glucose: C₆H₁₂O₆ + O₂ → CO₂ + H₂O. Then explain why the O₂ coefficient is smaller than you might expect from a 6-carbon molecule.',
+    hint:'Follow the C → H → O method. Then think about how much O glucose already contains.',
+    ans:'C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O',
+    explain:'6C→6CO₂. 12H→6H₂O. O needed: 12+6=18. O already in glucose: 6. Extra: 12 → 6O₂. For comparison, hexane (C₆H₁₄) needs 9.5O₂ (or 19O₂ after doubling). Glucose needs only 6O₂ because it already contains 6 oxygen atoms — making it "pre-oxidised" compared to an alkane of the same carbon number.'
+  },
+  {
+    id:'a9', diff:'advanced',
+    context:'Conceptual — explain the trend',
+    q:'Why does reactivity decrease going DOWN the alkali metals (Li → Na → K → Rb → Cs), but DECREASE going down the halogens (F → Cl → Br → I)? Explain the underlying reason for both trends.',
+    hint:'Both trends relate to atomic radius and how the nucleus interacts with electrons. Think about what each group is trying to do with electrons.',
+    ans:'Alkali metals get MORE reactive down the group. Halogens get LESS reactive down the group. Same cause, opposite effect.',
+    explain:'Alkali metals try to LOSE electrons. As you go down: atomic radius increases, outer electron is farther from nucleus, less strongly held → easier to remove → more reactive. Halogens try to GAIN electrons. As you go down: atomic radius increases, the nucleus is farther from the outer shell and attracts incoming electrons less strongly → harder to gain electrons → less reactive. The atomic radius trend is the same for both groups — what changes is what the atom is trying to do with electrons.'
+  },
+  {
+    id:'a10', diff:'advanced',
+    context:'Mixed concept — exam-style multi-part',
+    q:'Solution A contains Ag⁺ and NO₃⁻. Solution B contains Na⁺ and Cl⁻. (a) What forms when A and B are mixed? (b) Write the full ionic equation and net ionic equation. (c) Na⁺ and NO₃⁻ are called "spectator ions" — what does this mean and why don\'t they appear in the net ionic equation?',
+    hint:'Check solubility of AgCl and NaNO₃. Spectator ions are ions that don\'t change during the reaction.',
+    ans:'(a) AgCl precipitate (white solid). (b) Full ionic: Ag⁺ + NO₃⁻ + Na⁺ + Cl⁻ → AgCl(s) + Na⁺ + NO₃⁻. Net ionic: Ag⁺(aq) + Cl⁻(aq) → AgCl(s). (c) Spectator ions appear unchanged on both sides — they don\'t participate in bond-making or breaking. They\'re irrelevant to the reaction and are omitted from the net ionic equation.',
+    explain:'The net ionic equation shows only what actually changes — in this case, Ag⁺ and Cl⁻ forming an insoluble lattice. Na⁺ and NO₃⁻ float freely in solution before and after; they\'re just bystanders. Understanding this distinction is crucial for explaining precipitation reactions in exams.'
+  },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  answered: {},
+  mistakes: new Set(),
+  advAnswered: {},
+  advMistakes: new Set(),
+};
+let activeFilter = 'all';
+let openRx = null;
+let selMetal = null;
+let activeMacro = 'study';
+
+// ============================================================
+// RENDER — Session Plan
+// ============================================================
+function renderPlan() {
+  const cont = document.getElementById('plan-blocks');
+  const badgeMap = { concept: 'pb-concept', drills: 'pb-drill', review: 'pb-review', organic: 'pb-organic' };
+  const badgeLabel = { concept: 'concept', drills: 'drills', review: 'review', organic: 'organic' };
+  cont.innerHTML = planData.map((p, i) => `
+    <div class="plan-block" id="pb${i}">
+      <div class="plan-trigger" onclick="togglePlan(${i})">
+        <span class="plan-time">${p.time}</span>
+        <div style="display:flex;align-items:center;gap:7px;flex:1;flex-wrap:wrap">
+          ${p.badges.map(b => `<span class="plan-badge ${badgeMap[b]||'pb-concept'}">${badgeLabel[b]||b}</span>`).join('')}
+          <span class="plan-title-text">${p.title}</span>
+        </div>
+        <span class="plan-caret">▼</span>
+      </div>
+      <div class="plan-body">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:8px">${p.desc}</p>
+        ${p.notes}
+      </div>
+    </div>`).join('');
+}
+function togglePlan(i) {
+  const block = document.getElementById('pb' + i);
+  block.classList.toggle('open');
+}
+
+// Generic accordion toggle for deep-dive sections
+function toggleDD(id) {
+  const block = document.getElementById('dd-' + id);
+  if (!block) return;
+  block.classList.toggle('open');
+}
+
+// ============================================================
+// RENDER — Activity Series bars + family legend
+// ============================================================
+function renderSeries() {
+  // Legend
+  const legEl = document.getElementById('fam-legend');
+  legEl.innerHTML = familyInfo.map(f =>
+    `<div class="fam-item"><div class="fam-dot" style="background:${f.color}"></div>${f.label}</div>`
+  ).join('');
+
+  // Bars
+  const cont = document.getElementById('series-bars');
+  cont.innerHTML = metals.map((m, i) => `
+    <div class="metal-col" id="mc${i}" onclick="selectMetal(${i})" title="${m.name} · ${m.grp}">
+      <div class="metal-bar" style="height:${m.h}px;background:${m.color}"></div>
+      <div class="metal-sym">${m.sym}</div>
+      <div class="metal-grp">${m.grp.replace('Group ','G')}</div>
+    </div>`).join('');
+}
+function selectMetal(i) {
+  if (selMetal === i) {
+    selMetal = null;
+    document.getElementById('metal-detail').style.display = 'none';
+    document.querySelectorAll('.metal-col').forEach(c => c.classList.remove('sel'));
+    return;
+  }
+  selMetal = i;
+  document.querySelectorAll('.metal-col').forEach((c, j) => c.classList.toggle('sel', j === i));
+  const m = metals[i];
+  const aboveH = i < 10;
+  const canDisplace = metals.slice(i + 1).map(x => x.sym).filter(s => s !== 'H').join(', ') || 'none';
+  const det = document.getElementById('metal-detail');
+  det.style.display = 'block';
+  det.innerHTML = `
+    <span class="callout-label">${m.name} (${m.sym}) · ${m.grp} · Period ${m.period}</span>
+    ${m.note}<br><br>
+    <strong>Can displace:</strong> ${canDisplace === 'none' ? 'No metals below it in this series' : canDisplace}<br>
+    <strong>Acid reaction:</strong> ${aboveH ? 'Reacts with dilute acids → produces H₂ gas.' : 'Does NOT react with dilute acids (below H benchmark).'}`;
+}
+
+// ============================================================
+// RENDER — Solubility rules
+// ============================================================
+function renderRules() {
+  document.getElementById('rule-grid').innerHTML = solRules.map(r => `
+    <div class="rule-card">
+      <div class="rule-ion"><span class="dot ${r.cls}"></span>${r.ion}</div>
+      <div class="rule-text">${r.txt}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// PRECIP CHECKER
+// ============================================================
+function checkPrecip() {
+  const cat = document.getElementById('cat-sel').value;
+  const an = document.getElementById('an-sel').value;
+  const res = (precipRules[cat] || {})[an] || 'sol';
+  const details = {
+    insol:   { cls: 'c-coral', label: 'Precipitate forms ↓',  msg: 'This compound is insoluble. The ion product exceeds Ksp — a solid precipitate forms immediately.' },
+    sol:     { cls: 'c-mint',  label: 'Stays in solution',     msg: 'This compound is soluble. The ions remain dispersed in water — no precipitate forms.' },
+    partial: { cls: 'c-amber', label: 'Slightly soluble — depends on concentration', msg: 'This compound has limited solubility. At high concentrations a faint precipitate may form, but not always.' },
+  };
+  const d = details[res];
+  const cn = document.getElementById('cat-sel').selectedOptions[0].text;
+  const an2 = document.getElementById('an-sel').selectedOptions[0].text;
+  const el = document.getElementById('precip-result');
+  el.className = 'callout ' + d.cls;
+  el.style.marginBottom = '0';
+  el.innerHTML = `<span class="callout-label">${d.label}</span><strong>${cn} + ${an2}:</strong> ${d.msg}`;
+}
+
+// ============================================================
+// RENDER — Organic reaction cards
+// ============================================================
+function renderOrganic() {
+  const grid = document.getElementById('rx-grid');
+  const detailArea = document.getElementById('rx-detail-area');
+  grid.innerHTML = rxTypes.map(r => `
+    <div class="rx-card" id="rxc-${r.id}" onclick="toggleRx('${r.id}')">
+      <div class="rx-tags">${r.tags.map(t => `<span class="tag ${t.c}">${t.t}</span>`).join('')}</div>
+      <div class="rx-title">${r.title}</div>
+      <div class="rx-sub">${r.sub}</div>
+    </div>`).join('');
+  detailArea.innerHTML = rxTypes.map(r => `
+    <div class="rx-detail" id="rxd-${r.id}">
+      <ul class="blist" style="margin-bottom:8px">
+        ${r.bullets.map(b => `<li>${b.t}</li>`).join('')}
+      </ul>
+      <code class="eq">${r.eq}</code>
+    </div>`).join('');
+}
+function toggleRx(id) {
+  if (openRx && openRx !== id) {
+    document.getElementById('rxc-' + openRx).classList.remove('open');
+    document.getElementById('rxd-' + openRx).classList.remove('open');
+  }
+  const isOpen = document.getElementById('rxd-' + id).classList.contains('open');
+  document.getElementById('rxc-' + id).classList.toggle('open', !isOpen);
+  document.getElementById('rxd-' + id).classList.toggle('open', !isOpen);
+  openRx = isOpen ? null : id;
+}
+
+// ============================================================
+// O2 CALCULATOR
+// ============================================================
+function calcO2() {
+  const type = document.getElementById('mol-type').value;
+  document.getElementById('custom-row').style.display = type === 'custom' ? 'flex' : 'none';
+  document.getElementById('n-row').style.display = type === 'custom' ? 'none' : 'flex';
+  let C, H, O_in = 0, formula;
+  if (type === 'custom') {
+    C = parseInt(document.getElementById('c-val').value) || 0;
+    H = parseInt(document.getElementById('h-val').value) || 0;
+    O_in = parseInt(document.getElementById('o-val').value) || 0;
+    formula = `C${C}H${H}${O_in > 0 ? 'O' + O_in : ''}`;
+  } else {
+    const n = parseInt(document.getElementById('n-val').value) || 1;
+    if (type === 'alkane')  { C = n; H = 2*n+2; formula = `C${n}H${2*n+2}`; }
+    else if (type === 'alkene') { C = n; H = 2*n; formula = `C${n}H${2*n}`; }
+    else { C = n; H = 2*n+2; O_in = 1; formula = `C${n}H${2*n+2}O`; }
+  }
+  const co2 = C, h2o = H / 2;
+  const o_needed = 2*co2 + h2o;
+  const o_from_o2 = o_needed - O_in;
+  const o2_raw = o_from_o2 / 2;
+  const needsMult = o2_raw !== Math.floor(o2_raw);
+  const mult = needsMult ? 2 : 1;
+  const pf = mult > 1 ? mult + '' : '';
+  document.getElementById('calc-result').textContent =
+    `${pf}${formula} + ${mult>1?(o2_raw*mult):o2_raw}O₂ → ${mult>1?co2*mult:co2}CO₂ + ${mult>1?h2o*mult:h2o}H₂O\n\nStep 1 · CO₂ = ${co2} (one per C atom)\nStep 2 · H₂O = ${h2o} (half the H atoms)\nStep 3 · O needed on right = ${o_needed}${O_in > 0 ? `\nStep 4 · O already in molecule = ${O_in}  →  net O needed = ${o_from_o2}` : ''}\nStep ${O_in > 0 ? 5 : 4} · O₂ = ${o_from_o2} ÷ 2 = ${o2_raw}${needsMult ? '  →  × 2 to clear fraction' : ''}`;
+}
+
+// ============================================================
+// RENDER — Standard Drills
+// ============================================================
+function renderDrills() {
+  const cont = document.getElementById('drills-list');
+  let html = '';
+  let lastCat = '';
+  drills.forEach(d => {
+    if (activeFilter !== 'all' && activeFilter !== 'missed' && d.cat !== activeFilter) return;
+    if (activeFilter === 'missed' && !state.mistakes.has(d.id)) return;
+    if (activeFilter === 'all' && d.cat !== lastCat) {
+      html += `<div class="sec-label">${d.cat === 'inorganic' ? 'Inorganic (1–15)' : 'Organic (16–25)'}</div>`;
+      lastCat = d.cat;
+    }
+    const bc = state.answered[d.id] ? (state.answered[d.id] === 'got' ? 'got' : 'miss') : '';
+    const orgTag = d.cat === 'organic' ? `<span class="tag tpe">organic</span>` : '';
+    const diffCls = d.diff === 'easy' ? 'diff-easy' : d.diff === 'medium' ? 'diff-medium' : 'diff-hard';
+    html += `<div class="drill-card ${bc}" id="dc-${d.id}">
+      <div class="drill-header">
+        <div class="drill-num">${d.id}</div>
+        <span class="tag tb">${d.type}</span>
+        <span class="tag ${diffCls}">${d.diff}</span>
+        ${orgTag}
+        <span style="margin-left:auto;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace">${d.concept}</span>
+      </div>
+      <div class="drill-q">${d.q}</div>
+      <div class="drill-hint">${d.hint}</div>
+      <div class="answer-box" id="ab-${d.id}">
+        <div class="ans-text">${d.ans}</div>
+        <div class="ans-explain">${d.explain}</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-show" onclick="toggleAns(${d.id})">Show answer</button>
+        <button class="btn btn-got" onclick="markDrill(${d.id},'got')">Got it ✓</button>
+        <button class="btn btn-miss" onclick="markDrill(${d.id},'missed')">Missed it</button>
+      </div>
+    </div>`;
+  });
+  if (!html) html = `<div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px">No questions match this filter.</div>`;
+  cont.innerHTML = html;
+}
+function toggleAns(id) { document.getElementById('ab-' + id).classList.toggle('show'); }
+function markDrill(id, res) {
+  state.answered[id] = res;
+  if (res === 'missed') state.mistakes.add(id); else state.mistakes.delete(id);
+  const card = document.getElementById('dc-' + id);
+  if (card) { card.className = 'drill-card ' + (res === 'got' ? 'got' : 'miss'); }
+  updateStats(); renderReview();
+}
+function updateStats() {
+  const total = Object.keys(state.answered).length + Object.keys(state.advAnswered).length;
+  const got = Object.values(state.answered).filter(v => v === 'got').length +
+               Object.values(state.advAnswered).filter(v => v === 'got').length;
+  const miss = state.mistakes.size + state.advMistakes.size;
+  const n = Object.keys(state.answered).length;
+  const pct = total > 0 ? Math.round(got / total * 100) : 0;
+  document.getElementById('prog-text').textContent = n + ' / 25 answered';
+  document.getElementById('prog-fill').style.width = (n / 25 * 100).toFixed(0) + '%';
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-got').textContent = got;
+  document.getElementById('st-miss').textContent = miss;
+  document.getElementById('st-pct').textContent = pct + '%';
+}
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderDrills();
+}
+
+// ============================================================
+// RENDER — Advanced Drills
+// ============================================================
+function renderAdvanced() {
+  const cont = document.getElementById('advanced-list');
+  let html = '';
+  advDrills.forEach((d, idx) => {
+    const bc = state.advAnswered[d.id] ? (state.advAnswered[d.id] === 'got' ? 'got' : 'miss') : '';
+    html += `<div class="adv-drill-card ${bc}" id="adc-${d.id}">
+      <div class="drill-header">
+        <div class="drill-num" style="background:var(--lav-light);color:var(--lavender)">${idx+1}</div>
+        <span class="tag tp">${d.context}</span>
+        <span class="tag diff-advanced">advanced</span>
+      </div>
+      <div class="adv-q">${d.q}</div>
+      <div class="drill-hint">${d.hint}</div>
+      <div class="answer-box" id="aab-${d.id}">
+        <div class="ans-text">${d.ans}</div>
+        <div class="ans-explain">${d.explain}</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-show" onclick="document.getElementById('aab-${d.id}').classList.toggle('show')">Show answer</button>
+        <button class="btn btn-got" onclick="markAdv('${d.id}','got')">Got it ✓</button>
+        <button class="btn btn-miss" onclick="markAdv('${d.id}','missed')">Missed it</button>
+      </div>
+    </div>`;
+  });
+  cont.innerHTML = html;
+}
+function markAdv(id, res) {
+  state.advAnswered[id] = res;
+  if (res === 'missed') state.advMistakes.add(id); else state.advMistakes.delete(id);
+  const card = document.getElementById('adc-' + id);
+  if (card) card.className = 'adv-drill-card ' + (res === 'got' ? 'got' : 'miss');
+  const n = Object.keys(state.advAnswered).length;
+  document.getElementById('adv-prog-text').textContent = n + ' / 10 answered';
+  document.getElementById('adv-prog-fill').style.width = (n / 10 * 100).toFixed(0) + '%';
+  updateStats(); renderReview();
+}
+
+// ============================================================
+// RENDER — Review loop (includes both standard + advanced missed)
+// ============================================================
+function renderReview() {
+  const list = document.getElementById('review-list');
+  const allMissed = [];
+  state.mistakes.forEach(id => { const d = drills.find(x => x.id === id); if (d) allMissed.push({ type: 'std', d }); });
+  state.advMistakes.forEach(id => { const d = advDrills.find(x => x.id === id); if (d) allMissed.push({ type: 'adv', d }); });
+
+  if (allMissed.length === 0) {
+    list.innerHTML = `<div class="review-empty"><div class="big">🎉</div>No missed questions yet! Work through the drills and any mistakes will appear here.</div>`;
+    return;
+  }
+  list.innerHTML = allMissed.map(({ type, d }) => {
+    const isAdv = type === 'adv';
+    const cardClass = isAdv ? 'adv-drill-card' : 'drill-card';
+    const clearFn = isAdv ? `markAdv('${d.id}','got');renderReview()` : `markDrill(${d.id},'got');renderReview()`;
+    return `<div class="review-card">
+      <div class="review-label">${isAdv ? 'advanced · ' : ''}missed — retry this one</div>
+      <div class="drill-header">
+        ${isAdv ? `<span class="tag tp">${d.context}</span><span class="tag diff-advanced">advanced</span>` : `<span class="tag tb">${d.type}</span>`}
+      </div>
+      <div class="${isAdv ? 'adv-q' : 'drill-q'}" style="margin-top:8px">${isAdv ? d.q : d.q}</div>
+      <div class="drill-hint">${d.hint}</div>
+      <div class="answer-box" id="rab-${d.id}">
+        <div class="ans-text">${d.ans}</div>
+        <div class="ans-explain">${d.explain}</div>
+      </div>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-show" onclick="document.getElementById('rab-${d.id}').classList.toggle('show')">Show answer</button>
+        <button class="btn btn-clear" onclick="${clearFn}">Cleared it! ✓</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// NAVIGATION — Macro (Study System vs Deep Dive)
+// ============================================================
+function showMacro(macro, btn) {
+  activeMacro = macro;
+  document.querySelectorAll('.macro-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Show/hide sub-navs
+  document.getElementById('subnav-study').classList.toggle('visible', macro === 'study');
+  document.getElementById('subnav-deepdive').classList.toggle('visible', macro === 'deepdive');
+
+  // Show first tab of chosen macro
+  const firstBtn = document.querySelector(`#subnav-${macro} .sub-btn`);
+  if (firstBtn) {
+    // Deactivate all sub-btns
+    document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+    firstBtn.classList.add('active');
+    const tabId = macro === 'study' ? 'plan' : 'activity';
+    showTabById(tabId);
+  }
+}
+
+// ============================================================
+// NAVIGATION — Sub-tabs
+// ============================================================
+function showTab(name, btn, macro) {
+  document.querySelectorAll(`#subnav-${macro} .sub-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  showTabById(name);
+}
+function showTabById(name) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  const tab = document.getElementById('tab-' + name);
+  if (tab) tab.classList.add('active');
+  if (name === 'review') renderReview();
+}
+function showTabByName(name) {
+  // Used by workflow cards — also activates the correct sub-btn
+  showTabById(name);
+  document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+  const targetOnclick = `showTab('${name}`,
+  matchBtn = [...document.querySelectorAll('.sub-btn')].find(b => b.getAttribute('onclick') && b.getAttribute('onclick').startsWith(`showTab('${name}'`));
+  if (matchBtn) matchBtn.classList.add('active');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderPlan();
+renderSeries();
+renderRules();
+renderOrganic();
+renderDrills();
+renderAdvanced();
+renderReview();
+calcO2();
+checkPrecip();
+</script>
+</body>
+</html>
